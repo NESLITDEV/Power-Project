@@ -16,9 +16,11 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { KeenIcon } from "@/components/keenicons";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
+import { FormattedMessage } from "react-intl";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -29,6 +31,11 @@ const ExpenseTable = () => {
   const [loading, setLoading] = useState(true);
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [currentPage, setCurrentPage] = useState(1);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [dateRange, setDateRange] = useState({
+    startDate: "",
+    endDate: "",
+  });
   const { auth } = useAuthContext();
 
   useEffect(() => {
@@ -43,6 +50,7 @@ const ExpenseTable = () => {
           }
         );
         setExpenses(response.data);
+        console.log(response.data);
         setFilteredExpenses(response.data);
       } catch (error) {
         console.error("Error fetching expenses:", error);
@@ -56,16 +64,41 @@ const ExpenseTable = () => {
     }
   }, [auth?.id, auth?.token]);
 
+  // Apply filters whenever search query, date range, or expense type changes
   useEffect(() => {
-    if (selectedType === "all") {
-      setFilteredExpenses(expenses);
-    } else {
-      setFilteredExpenses(
-        expenses.filter((expense) => expense.expenseTypeName === selectedType)
+    let filtered = [...expenses];
+
+    // Filter by type
+    if (selectedType !== "all") {
+      filtered = filtered.filter(
+        (expense) => expense.expenseTypeName === selectedType
       );
     }
-    setCurrentPage(1); // Reset to first page when filter changes
-  }, [selectedType, expenses]);
+
+    // Filter by date range
+    if (dateRange.startDate && dateRange.endDate) {
+      filtered = filtered.filter((expense) => {
+        const expenseDate = new Date(expense.createdDate);
+        const startDate = new Date(dateRange.startDate);
+        const endDate = new Date(dateRange.endDate);
+        return expenseDate >= startDate && expenseDate <= endDate;
+      });
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (expense) =>
+          expense.expenseTypeName.toLowerCase().includes(query) ||
+          expense.quantity.toString().includes(query) ||
+          expense.totalCost.toString().includes(query)
+      );
+    }
+
+    setFilteredExpenses(filtered);
+    setCurrentPage(1); // Reset to first page when filters change
+  }, [selectedType, expenses, searchQuery, dateRange]);
 
   const handleSort = (key) => {
     let direction = "asc";
@@ -99,6 +132,17 @@ const ExpenseTable = () => {
     setCurrentPage(pageNumber);
   };
 
+  const handleDateRangeChange = (e) => {
+    const { name, value } = e.target;
+    setDateRange((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setDateRange({ startDate: "", endDate: "" });
+    setSelectedType("all");
+  };
+
   if (loading) {
     return (
       <Card className="p-6">
@@ -113,29 +157,69 @@ const ExpenseTable = () => {
 
   return (
     <Card className="p-6">
-      <div className="flex justify-between items-center mb-6">
-        <div className="space-y-1">
-          <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
-            My Expenses
-          </h2>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Showing {startIndex + 1} to{" "}
-            {Math.min(endIndex, filteredExpenses.length)} of{" "}
-            {filteredExpenses.length} entries
-          </p>
+      <div className="flex flex-col gap-4 mb-6">
+        <div className="flex justify-between items-center">
+          <div className="space-y-1">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+              My Expenses
+            </h2>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Showing {startIndex + 1} to{" "}
+              {Math.min(endIndex, filteredExpenses.length)} of{" "}
+              {filteredExpenses.length} entries
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <Select value={selectedType} onValueChange={setSelectedType}>
+              <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800">
+                <SelectValue placeholder="Filter by type" />
+              </SelectTrigger>
+              <SelectContent>
+                {expenseTypes.map((type) => (
+                  <SelectItem key={type} value={type}>
+                    {type === "all" ? "All Types" : type}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <Select value={selectedType} onValueChange={setSelectedType}>
-          <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800">
-            <SelectValue placeholder="Filter by type" />
-          </SelectTrigger>
-          <SelectContent>
-            {expenseTypes.map((type) => (
-              <SelectItem key={type} value={type}>
-                {type === "all" ? "All Types" : type}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+
+        {/* Search and Date Range Filters */}
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-1">
+            <Input
+              type="text"
+              placeholder="Search expenses..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full"
+            />
+          </div>
+          <div className="flex gap-4">
+            <Input
+              type="date"
+              name="startDate"
+              value={dateRange.startDate}
+              onChange={handleDateRangeChange}
+              className="w-[150px]"
+            />
+            <Input
+              type="date"
+              name="endDate"
+              value={dateRange.endDate}
+              onChange={handleDateRangeChange}
+              className="w-[150px]"
+            />
+            <Button
+              variant="outline"
+              onClick={clearFilters}
+              className="whitespace-nowrap"
+            >
+              Clear Filters
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">

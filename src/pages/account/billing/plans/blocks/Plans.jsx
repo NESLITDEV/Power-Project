@@ -21,9 +21,19 @@ const Plans = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { auth } = useAuthContext();
+  const { auth, saveSessionData } = useAuthContext();
 
-  // Check for payment status in URL
+  const userRole = auth?.roles?.[0] || "Free";
+
+  const isCurrentPlan = (planKey) => {
+    if (userRole.toLowerCase() === "premium" && planKey === "private")
+      return true;
+    if (userRole.toLowerCase() === "company" && planKey === "company")
+      return true;
+    if (userRole.toLowerCase() === "free" && planKey === "free") return true;
+    return false;
+  };
+
   const paymentStatus = searchParams.get("payment_status");
 
   useEffect(() => {
@@ -56,12 +66,10 @@ const Plans = () => {
     if (!product?.prices) return null;
 
     if (isAnnual) {
-      // Get annual price (200 EUR for Premium, 1200 EUR for Company)
       return product.prices.find(
         (price) => price.amount === (product.name === "Premium" ? 200 : 1200)
       );
     } else {
-      // Get monthly price (16.67 EUR for Premium, 100 EUR for Company)
       return product.prices.find(
         (price) => price.amount === (product.name === "Premium" ? 16.67 : 100)
       );
@@ -93,16 +101,13 @@ const Plans = () => {
         return;
       }
 
-      // Get user ID from auth context
-      const userId = auth.userId || auth.id || auth.sub;
-
+      const userId = auth.userId || auth.id;
       if (!userId) {
         console.error("No user ID found");
         setError("User ID not found. Please log out and log in again.");
         return;
       }
 
-      // Create request body
       const requestBody = {
         userId: userId,
         stripeCustomerId: auth.stripeCustomerId,
@@ -118,21 +123,21 @@ const Plans = () => {
           : isAnnual
             ? "one_time_annual"
             : "one_time_monthly",
-        successUrl: `${window.location.origin}/account/billing/plans/success`,
-        cancelUrl: `${window.location.origin}/account/billing/plans/failed`,
       };
 
-      console.log("Sending request to purchase plan:", requestBody);
-
-      // Make API call to purchase plan
       const response = await axios.post(
         `${API_URL}/Stripe/purchase-plan`,
         requestBody
       );
 
-      // Check if the response contains a URL for Stripe checkout
       if (response.data && response.data.url) {
-        // Redirect to the Stripe checkout URL
+        localStorage.setItem(
+          "stripeSessionData",
+          JSON.stringify({
+            sessionId: response.data.sessionId,
+            requestBody: requestBody,
+          })
+        );
         window.location.href = response.data.url;
       } else {
         console.error("No checkout URL returned from API");
@@ -144,12 +149,10 @@ const Plans = () => {
     }
   };
 
-  // If payment was successful, show success component
   if (paymentStatus === "success") {
     return <PaymentSuccess />;
   }
 
-  // If payment failed, show failure component
   if (paymentStatus === "failed") {
     return <PaymentFailure />;
   }
@@ -348,15 +351,27 @@ const Plans = () => {
               </div>
             </td>
             <td className="!border-b-0 table-border-s table-border-t card-rounded-tl bg-light-active dark:bg-coal-100 !p-5 !pt-7.5 relative">
-              <span className="absolute badge badge-sm badge-outline badge-success absolutes top-0 start-1/2 rtl:translate-x-1/2 -translate-x-1/2 -translate-y-1/2">
-                <FormattedMessage id="PLANS.CURRENT_PLAN" />
-              </span>
+              {isCurrentPlan("free") && (
+                <span className="absolute badge badge-sm badge-outline badge-success absolutes top-0 start-1/2 rtl:translate-x-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <FormattedMessage id="PLANS.CURRENT_PLAN" />
+                </span>
+              )}
               {renderPlanInfo("free", plans.info.free)}
             </td>
-            <td className="!border-b-0 table-border-s table-border-t !p-5 !pt-7.5">
+            <td className="!border-b-0 table-border-s table-border-t !p-5 !pt-7.5 relative">
+              {isCurrentPlan("private") && (
+                <span className="absolute badge badge-sm badge-outline badge-success absolutes top-0 start-1/2 rtl:translate-x-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <FormattedMessage id="PLANS.CURRENT_PLAN" />
+                </span>
+              )}
               {renderPlanInfo("private", plans.info.private)}
             </td>
-            <td className="!border-b-0 table-border-s table-border-t card-rounded-tr !p-5 !pt-7.5">
+            <td className="!border-b-0 table-border-s table-border-t card-rounded-tr !p-5 !pt-7.5 relative">
+              {isCurrentPlan("company") && (
+                <span className="absolute badge badge-sm badge-outline badge-success absolutes top-0 start-1/2 rtl:translate-x-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <FormattedMessage id="PLANS.CURRENT_PLAN" />
+                </span>
+              )}
               {renderPlanInfo("company", plans.info.company)}
             </td>
           </tr>

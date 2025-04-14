@@ -25,6 +25,7 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [auth, setAuth] = useState(authHelper.getAuth());
   const [currentUser, setCurrentUser] = useState();
+  const [sessionData, setSessionData] = useState(null);
 
   const verify = async () => {
     if (!auth) {
@@ -34,21 +35,37 @@ const AuthProvider = ({ children }) => {
     setCurrentUser(auth);
   };
 
-  const saveAuth = (auth) => {
-    if (auth?.token) {
-      try {
-        const decodedToken = jwtDecode(auth.token);
-        auth.stripeCustomerId = decodedToken.StripeCustomerId;
-      } catch (error) {
-        console.error("Error decoding token:", error);
-      }
+const saveAuth = (auth) => {
+  if (auth?.token) {
+    try {
+      const decodedToken = jwtDecode(auth.token);
+      auth.stripeCustomerId = decodedToken.StripeCustomerId;
+
+      // ✅ Extract roles from token claim
+      const rolesFromToken =
+        decodedToken[
+          "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
+        ];
+
+      auth.roles = Array.isArray(rolesFromToken)
+        ? rolesFromToken
+        : [rolesFromToken];
+    } catch (error) {
+      console.error("Error decoding token:", error);
     }
-    setAuth(auth);
-    if (auth) {
-      authHelper.setAuth(auth);
-    } else {
-      authHelper.removeAuth();
-    }
+  }
+
+  setAuth(auth);
+
+  if (auth) {
+    authHelper.setAuth(auth);
+  } else {
+    authHelper.removeAuth();
+  }
+};
+
+  const saveSessionData = (data) => {
+    setSessionData(data);
   };
 
   const login = async (email, password) => {
@@ -172,6 +189,8 @@ const AuthProvider = ({ children }) => {
         logout,
         verify,
         confirmEmailWithUrl,
+        sessionData,
+        saveSessionData,
       }}
     >
       {children}

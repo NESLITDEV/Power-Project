@@ -42,40 +42,49 @@ const UtilityManagement = () => {
   const { auth } = useAuthContext();
 
   useEffect(() => {
-    const fetchExpenseTypes = async () => {
-      try {
-        const response = await axios.post(
-          `${import.meta.env.VITE_APP_API_URL}/Auth/Get-Role-Expense-Types`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth?.token}`,
-            },
-          }
-        );
-
-        // Find the user's role and its expense types
-        const userRoleData = response.data.find((role) =>
-          auth.roles.includes(role.roleName)
-        );
-        if (userRoleData) {
-          setUserRole(userRoleData.roleName);
-          setExpenseTypes(userRoleData.expenseTypes);
-        }
-      } catch (error) {
-        console.error("Error fetching expense types:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    fetchExpenseTypes();
 
     if (auth?.token) {
       fetchExpenseTypes();
     }
   }, [auth?.token, auth?.roles]);
 
+  const fetchExpenseTypes = async () => {
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/ExpenseTypes/Get-All-Expense-Types?activeOnly=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+          },
+        }
+      );
+
+      const userPrimaryRole = auth.roles?.[0];
+      setUserRole(userPrimaryRole);
+
+      // Format each expense type into the expected structure
+      const formattedTypes = response.data.map((item) => ({
+        expenseTypeId: item.expenseTypeId,
+        expenseTypeName: item.expenseName,
+        expenseCategoryId: item.expenseCategoryId,
+        unitOfMeasurement: item.unitOfMeasurement,
+      }));
+
+      setExpenseTypes(formattedTypes);
+    } catch (error) {
+      console.error("Error fetching expense types:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Handle utility change
   const handleUtilityChange = (value) => {
-    if (value === "add_new" && userRole === "Platinum") {
+    if (
+      value === "add_new" &&
+      (userRole === "Premium" || userRole === "Company")
+    ) {
       setIsAddExpenseTypeOpen(true);
       return;
     }
@@ -124,20 +133,7 @@ const UtilityManagement = () => {
         setIsAddExpenseTypeOpen(false);
         setNewExpenseType("");
         // Refresh expense types
-        const typesResponse = await axios.post(
-          `${import.meta.env.VITE_APP_API_URL}/Auth/Get-Role-Expense-Types`,
-          {
-            headers: {
-              Authorization: `Bearer ${auth?.token}`,
-            },
-          }
-        );
-        const userRoleData = typesResponse.data.find((role) =>
-          auth.roles.includes(role.roleName)
-        );
-        if (userRoleData) {
-          setExpenseTypes(userRoleData.expenseTypes);
-        }
+        fetchExpenseTypes();
       } else {
         toast.error(
           <FormattedMessage id="UTILITY.MANAGEMENT.ERROR.ADD_EXPENSE_TYPE_FAILED" />
@@ -203,7 +199,7 @@ const UtilityManagement = () => {
                     {type.expenseTypeName}
                   </SelectItem>
                 ))}
-                {userRole === "Platinum" && (
+                {["Premium", "Company"].includes(userRole) && (
                   <SelectItem
                     value="add_new"
                     className="text-blue-600 dark:text-blue-400"
@@ -264,9 +260,7 @@ const UtilityManagement = () => {
                 <Input
                   value={newExpenseType}
                   onChange={(e) => setNewExpenseType(e.target.value)}
-                  placeholder={
-                    <FormattedMessage id="UTILITY.MANAGEMENT.EXPENSE_TYPE_PLACEHOLDER" />
-                  }
+                  placeholder="Enter Expense Name"
                   className="w-full"
                 />
               </div>

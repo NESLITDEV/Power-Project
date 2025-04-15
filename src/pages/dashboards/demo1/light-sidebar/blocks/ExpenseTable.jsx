@@ -50,7 +50,6 @@ const ExpenseTable = () => {
           }
         );
         setExpenses(response.data);
-        console.log(response.data);
         setFilteredExpenses(response.data);
       } catch (error) {
         console.error("Error fetching expenses:", error);
@@ -78,7 +77,7 @@ const ExpenseTable = () => {
     // Filter by date range
     if (dateRange.startDate && dateRange.endDate) {
       filtered = filtered.filter((expense) => {
-        const expenseDate = new Date(expense.createdDate);
+        const expenseDate = new Date(expense.expenseForDate);
         const startDate = new Date(dateRange.startDate);
         const endDate = new Date(dateRange.endDate);
         return expenseDate >= startDate && expenseDate <= endDate;
@@ -279,7 +278,7 @@ const ExpenseTable = () => {
                 className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
               >
                 <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300">
-                  {new Date(expense.createdDate).toLocaleDateString(undefined, {
+                  {new Date(expense.expenseForDate).toLocaleDateString(undefined, {
                     year: "numeric",
                     month: "2-digit",
                     day: "2-digit",

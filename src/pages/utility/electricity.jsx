@@ -87,7 +87,7 @@ const ElectricityUsage = ({
           quantity: parseFloat(formData.unitsConsumed),
           ratePerUnit: parseFloat(formData.ratePerUnit),
           status: 1,
-          expenseForDate: new Date(formData.date).toISOString(),
+          expenseForDate: formData.date,
         },
         {
           headers: {
@@ -96,7 +96,6 @@ const ElectricityUsage = ({
         }
       );
 
-      console.log("API Response:", response.data);
       toast.success(
         intl.formatMessage(
           { id: "UTILITY.ELECTRICITY.SUCCESS.RECORDED" },

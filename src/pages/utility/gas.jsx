@@ -49,6 +49,7 @@ const GasUsage = ({ selectedFile, setSelectedFile }) => {
       toast.error("Please fill in all required fields");
       return;
     }
+    console.log("Form submitted:", formData);
     toast.success("Reading saved successfully");
     
     // Reset form data

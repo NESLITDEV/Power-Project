@@ -37,6 +37,7 @@ const GenericExpense = ({ selectedFile, setSelectedFile }) => {
       return;
     }
     // Submit form data
+    console.log("Form submitted:", formData);
     toast.success("Expense saved successfully");
 
     // Reset form

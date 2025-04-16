@@ -4,6 +4,7 @@ import { KeenIcon } from "@/components/keenicons";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { FormattedMessage } from "react-intl";
+import UtilityPieChart from "./blocks/UtilityPieChart";
 
 const Demo1LightSidebarContent = () => {
   const [expenses, setExpenses] = useState([]);
@@ -164,15 +165,12 @@ const Demo1LightSidebarContent = () => {
     };
   };
 
-  // Handle carousel navigation
   const nextSlide = () => {
-    const maxSlides = Math.max(0, expenseTypes.length - 2);
-    setCurrentSlide((prev) => (prev >= maxSlides ? 0 : prev + 1));
+    setCurrentSlide((prev) => (prev >= expenseTypes.length - 1 ? 0 : prev + 1));
   };
 
   const prevSlide = () => {
-    const maxSlides = Math.max(0, expenseTypes.length - 2);
-    setCurrentSlide((prev) => (prev <= 0 ? maxSlides : prev - 1));
+    setCurrentSlide((prev) => (prev <= 0 ? expenseTypes.length - 1 : prev - 1));
   };
 
   // Get visible items for the current slide
@@ -210,7 +208,6 @@ const Demo1LightSidebarContent = () => {
       {/* Channel Stats Section with Carousel */}
       <div className="relative">
         {loading ? (
-          // Loading skeleton for Channel Stats
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {[1, 2, 3].map((index) => (
               <div
@@ -235,49 +232,7 @@ const Demo1LightSidebarContent = () => {
           <>
             <div className="overflow-hidden">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {getVisibleItems().map((expenseType, index) => {
-                  const stats = getUtilityStats(expenseType);
-                  const colorClasses = getIconColorClasses(index);
-                  return (
-                    <div
-                      key={expenseType}
-                      className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md"
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center space-x-3">
-                          <div
-                            className={`w-12 h-12 flex items-center justify-center ${colorClasses.bg} rounded-lg`}
-                          >
-                            <KeenIcon
-                              icon="electricity"
-                              className={colorClasses.text}
-                            />
-                          </div>
-                          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                            {expenseType}
-                          </h3>
-                        </div>
-                        <span
-                          className={`text-sm font-medium ${stats.change >= 0 ? "text-green-500" : "text-red-500"}`}
-                        >
-                          {stats.change > 0 ? "+" : ""}
-                          {stats.change.toFixed(1)}%
-                        </span>
-                      </div>
-                      <div className="space-y-2">
-                        <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                          {stats.quantity.toLocaleString()}{" "}
-                          {getUnit(expenseType)}
-                        </div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
-                          <FormattedMessage id="DASHBOARD.MONTHLY_CONSUMPTION" />
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-
-                {/* Total Cost Card - Always visible */}
+                {/* 1️⃣ Total Cost */}
                 <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-3">
@@ -304,11 +259,68 @@ const Demo1LightSidebarContent = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* 2️⃣ Expense Type - ONLY ONE DISPLAYED AT A TIME */}
+                {expenseTypes.length > 0 &&
+                  (() => {
+                    const expenseType = expenseTypes[currentSlide]; // ✅ Direct access
+                    if (!expenseType) return null;
+
+                    const stats = getUtilityStats(expenseType);
+                    const colorClasses = getIconColorClasses(currentSlide);
+
+                    return (
+                      <div
+                        key={expenseType}
+                        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md"
+                      >
+                        <div className="flex items-center justify-between mb-4">
+                          <div className="flex items-center space-x-3">
+                            <div
+                              className={`w-12 h-12 flex items-center justify-center ${colorClasses.bg} rounded-lg`}
+                            >
+                              <KeenIcon
+                                icon="electricity"
+                                className={colorClasses.text}
+                              />
+                            </div>
+                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                              {expenseType}
+                            </h3>
+                          </div>
+                          <span
+                            className={`text-sm font-medium ${
+                              stats.change >= 0
+                                ? "text-green-500"
+                                : "text-red-500"
+                            }`}
+                          >
+                            {stats.change > 0 ? "+" : ""}
+                            {stats.change.toFixed(1)}%
+                          </span>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                            {stats.quantity.toLocaleString()}{" "}
+                            {getUnit(expenseType)}
+                          </div>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            <FormattedMessage id="DASHBOARD.MONTHLY_CONSUMPTION" />
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                {/* 3️⃣ Pie Chart */}
+                {expenseTypes.length > 0 && (
+                  <UtilityPieChart expenses={expenses} />
+                )}
               </div>
             </div>
 
-            {/* Carousel Navigation - Only show if there are more than 2 items */}
-            {expenseTypes.length > 2 && (
+            {/* ⏩ Carousel Controls (only if more than 1) */}
+            {expenseTypes.length > 1 && (
               <div className="flex justify-between mt-4">
                 <button
                   onClick={prevSlide}
@@ -317,19 +329,19 @@ const Demo1LightSidebarContent = () => {
                   <KeenIcon icon="arrow-left" />
                 </button>
                 <div className="flex space-x-2">
-                  {Array.from({
-                    length: Math.ceil(expenseTypes.length / 2),
-                  }).map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setCurrentSlide(index * 2)}
-                      className={`w-2 h-2 rounded-full ${
-                        Math.floor(currentSlide / 2) === index
-                          ? "bg-primary"
-                          : "bg-gray-300 dark:bg-gray-600"
-                      }`}
-                    />
-                  ))}
+                  {Array.from({ length: expenseTypes.length }).map(
+                    (_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setCurrentSlide(index)}
+                        className={`w-2 h-2 rounded-full ${
+                          currentSlide === index
+                            ? "bg-primary"
+                            : "bg-gray-300 dark:bg-gray-600"
+                        }`}
+                      />
+                    )
+                  )}
                 </div>
                 <button
                   onClick={nextSlide}

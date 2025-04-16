@@ -51,6 +51,7 @@ const FuelBills = ({ selectedFile, setSelectedFile }) => {
       return;
     }
     // Submit form data
+    console.log("Form submitted:", formData);
     toast.success("Bill saved successfully");
 
     // Reset form

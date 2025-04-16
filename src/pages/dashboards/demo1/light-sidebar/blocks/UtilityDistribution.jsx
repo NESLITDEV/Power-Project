@@ -25,7 +25,6 @@ import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { format } from "date-fns";
 
-// Register ChartJS components
 ChartJS.register(
   ArcElement,
   Tooltip,
@@ -39,74 +38,36 @@ ChartJS.register(
   Filler
 );
 
-// Enhanced gradient colors
-const createGradient = (ctx, color) => {
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, color.light);
-  gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-  return gradient;
-};
-
 const UtilityDistribution = () => {
   const [timeRange, setTimeRange] = useState("month");
+  const [pieTimeRange, setPieTimeRange] = useState("month");
   const [selectedType, setSelectedType] = useState("all");
   const [chartType, setChartType] = useState("line");
   const [expenses, setExpenses] = useState([]);
   const [expenseTypes, setExpenseTypes] = useState([]);
   const { auth } = useAuthContext();
 
-  // Enhanced color palette generator with gradients
   const generateColors = (index) => {
     const colorPalettes = [
       {
-        main: "rgb(56, 189, 248)", // Sky blue
+        main: "rgb(56, 189, 248)",
         light: "rgba(56, 189, 248, 0.5)",
-        shadow: "rgba(56, 189, 248, 0.1)",
       },
       {
-        main: "rgb(244, 63, 94)", // Rose red
+        main: "rgb(244, 63, 94)",
         light: "rgba(244, 63, 94, 0.5)",
-        shadow: "rgba(244, 63, 94, 0.1)",
       },
       {
-        main: "rgb(16, 185, 129)", // Emerald green
+        main: "rgb(16, 185, 129)",
         light: "rgba(16, 185, 129, 0.5)",
-        shadow: "rgba(16, 185, 129, 0.1)",
       },
       {
-        main: "rgb(168, 85, 247)", // Purple
+        main: "rgb(168, 85, 247)",
         light: "rgba(168, 85, 247, 0.5)",
-        shadow: "rgba(168, 85, 247, 0.1)",
       },
       {
-        main: "rgb(245, 158, 11)", // Amber
+        main: "rgb(245, 158, 11)",
         light: "rgba(245, 158, 11, 0.5)",
-        shadow: "rgba(245, 158, 11, 0.1)",
-      },
-      {
-        main: "rgb(236, 72, 153)", // Pink
-        light: "rgba(236, 72, 153, 0.5)",
-        shadow: "rgba(236, 72, 153, 0.1)",
-      },
-      {
-        main: "rgb(20, 184, 166)", // Teal
-        light: "rgba(20, 184, 166, 0.5)",
-        shadow: "rgba(20, 184, 166, 0.1)",
-      },
-      {
-        main: "rgb(234, 88, 12)", // Orange
-        light: "rgba(234, 88, 12, 0.5)",
-        shadow: "rgba(234, 88, 12, 0.1)",
-      },
-      {
-        main: "rgb(99, 102, 241)", // Indigo
-        light: "rgba(99, 102, 241, 0.5)",
-        shadow: "rgba(99, 102, 241, 0.1)",
-      },
-      {
-        main: "rgb(220, 38, 38)", // Red
-        light: "rgba(220, 38, 38, 0.5)",
-        shadow: "rgba(220, 38, 38, 0.1)",
       },
     ];
     return colorPalettes[index % colorPalettes.length];
@@ -124,280 +85,141 @@ const UtilityDistribution = () => {
           }
         );
         setExpenses(response.data);
-
-        const types = [
-          ...new Set(response.data.map((expense) => expense.expenseTypeName)),
-        ];
+        const types = [...new Set(response.data.map((e) => e.expenseTypeName))];
         setExpenseTypes(types);
       } catch (error) {
         console.error("Error fetching expenses:", error);
       }
     };
 
-    if (auth?.id) {
-      fetchExpenses();
-    }
+    if (auth?.id) fetchExpenses();
   }, [auth?.id, auth?.token]);
 
-  // Enhanced pie chart data
-  const getCollectiveData = () => {
-    const typeData = {};
-    expenses.forEach((expense) => {
-      if (!typeData[expense.expenseTypeName]) {
-        typeData[expense.expenseTypeName] = 0;
-      }
-      typeData[expense.expenseTypeName] += expense.totalCost;
+  // ⛔️ Commented out Pie Chart logic for future use
+  // const getCollectiveData = () => {
+  //   const typeData = {};
+  //   const now = new Date();
+  //   let cutoff = new Date();
+
+  //   switch (pieTimeRange) {
+  //     case "day":
+  //       cutoff.setDate(now.getDate() - 1);
+  //       break;
+  //     case "7days":
+  //       cutoff.setDate(now.getDate() - 7);
+  //       break;
+  //     case "month":
+  //       cutoff.setMonth(now.getMonth() - 1);
+  //       break;
+  //     case "6months":
+  //       cutoff.setMonth(now.getMonth() - 6);
+  //       break;
+  //     case "year":
+  //       cutoff.setFullYear(now.getFullYear() - 1);
+  //       break;
+  //   }
+
+  //   const filtered = expenses.filter(
+  //     (e) => new Date(e.expenseForDate) >= cutoff
+  //   );
+
+  //   filtered.forEach((e) => {
+  //     if (!typeData[e.expenseTypeName]) {
+  //       typeData[e.expenseTypeName] = 0;
+  //     }
+  //     typeData[e.expenseTypeName] += e.totalCost;
+  //   });
+
+  //   return {
+  //     labels: Object.keys(typeData),
+  //     datasets: [
+  //       {
+  //         data: Object.values(typeData),
+  //         backgroundColor: Object.keys(typeData).map((_, i) => generateColors(i).light),
+  //         borderColor: Object.keys(typeData).map((_, i) => generateColors(i).main),
+  //         borderWidth: 2,
+  //         hoverBorderWidth: 4,
+  //         hoverOffset: 15,
+  //         borderRadius: 3,
+  //       },
+  //     ],
+  //   };
+  // };
+
+  const getChartData = () => {
+    const cutoffDate = new Date();
+    switch (timeRange) {
+      case "day":
+        cutoffDate.setDate(cutoffDate.getDate() - 1);
+        break;
+      case "7days":
+        cutoffDate.setDate(cutoffDate.getDate() - 7);
+        break;
+      case "month":
+        cutoffDate.setMonth(cutoffDate.getMonth() - 1);
+        break;
+      case "6months":
+        cutoffDate.setMonth(cutoffDate.getMonth() - 6);
+        break;
+      case "year":
+        cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
+        break;
+    }
+
+    const filtered = expenses.filter(
+      (e) => new Date(e.expenseForDate) >= cutoffDate
+    );
+    const allDates = [
+      ...new Set(
+        filtered.map((e) =>
+          format(
+            new Date(e.expenseForDate),
+            timeRange === "year" || timeRange === "6months" ? "MM" : "MM/dd"
+          )
+        )
+      ),
+    ];
+
+    const datasets = expenseTypes.map((type, index) => {
+      const typeExpenses = filtered.filter((e) => e.expenseTypeName === type);
+      const colors = generateColors(index);
+      return {
+        label: type,
+        data: allDates.map((label) =>
+          typeExpenses
+            .filter(
+              (e) =>
+                format(
+                  new Date(e.expenseForDate),
+                  timeRange === "year" || timeRange === "6months"
+                    ? "MM"
+                    : "MM/dd"
+                ) === label
+            )
+            .reduce((sum, e) => sum + e.quantity, 0)
+        ),
+        borderColor: colors.main,
+        backgroundColor: colors.light,
+        fill: chartType === "area",
+        tension: 0.4,
+      };
     });
 
-    return {
-      labels: Object.keys(typeData),
-      datasets: [
-        {
-          data: Object.values(typeData),
-          backgroundColor: Object.keys(typeData).map(
-            (_, index) => generateColors(index).light
-          ),
-          borderColor: Object.keys(typeData).map(
-            (_, index) => generateColors(index).main
-          ),
-          borderWidth: 2,
-          hoverBorderWidth: 4,
-          hoverOffset: 15,
-          borderRadius: 3,
-        },
-      ],
-    };
+    return { labels: allDates.sort(), datasets };
   };
 
-  // Enhanced chart type options
-  const getChartTypeOptions = (type, ctx = null, colors = null) => {
-    // If colors are not provided or selectedType is 'all', use default colors
-    if (!colors || selectedType === "all") {
-      colors = {
-        main: "rgb(56, 189, 248)", // Default sky blue
-        light: "rgba(56, 189, 248, 0.5)",
-        shadow: "rgba(56, 189, 248, 0.1)",
-      };
-    }
-
-    const baseOptions = {
-      borderColor: colors.main,
-      borderWidth: 2,
-      pointRadius: 4,
-      pointHoverRadius: 8,
-    };
-
-    switch (type) {
-      case "bar":
-        return {
-          ...baseOptions,
-          type: "bar",
-          borderRadius: 6,
-          borderWidth: 0,
-          backgroundColor: colors.light,
-          hoverBackgroundColor: colors.main,
-          barThickness: 12,
-        };
-      case "area":
-        return {
-          ...baseOptions,
-          type: "line",
-          fill: true,
-          backgroundColor: ctx ? createGradient(ctx, colors) : colors.light,
-          pointBackgroundColor: colors.main,
-          tension: 0.4,
-        };
-      default: // line
-        return {
-          ...baseOptions,
-          type: "line",
-          borderWidth: 3,
-          pointBackgroundColor: colors.main,
-          pointBorderColor: "white",
-          pointBorderWidth: 2,
-          pointShadowBlur: 10,
-          tension: 0.4,
-        };
-    }
-  };
-
-  // Process data for individual or collective charts
-  const getChartData = () => {
-    const timeRangeFilter = {
-      day: 1,
-      month: 30,
-      year: 365,
-    };
-
-    const daysToShow = timeRangeFilter[timeRange];
-    const cutoffDate = new Date();
-    cutoffDate.setDate(cutoffDate.getDate() - daysToShow);
-
-    const filteredByTime = expenses.filter(
-      (expense) => new Date(expense.createdDate) >= cutoffDate
-    );
-
-    if (selectedType === "all") {
-      // Create datasets for all expense types
-      const datasets = expenseTypes.map((type, index) => {
-        const typeExpenses = filteredByTime
-          .filter((expense) => expense.expenseTypeName === type)
-          .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
-
-        const colors = generateColors(index);
-
-        return {
-          label: type,
-          data: typeExpenses.map((expense) => expense.quantity),
-          borderColor: colors.main,
-          backgroundColor: colors.light,
-          fill: chartType === "area",
-          tension: 0.4,
-          pointRadius: 4,
-          pointHoverRadius: 8,
-          pointBackgroundColor: colors.main,
-          pointBorderColor: "white",
-          pointBorderWidth: 2,
-          // Adjust opacity for area charts to prevent overlapping
-          borderWidth: chartType === "area" ? 2 : 3,
-        };
-      });
-
-      // Get all unique dates for x-axis
-      const allDates = [
-        ...new Set(
-          filteredByTime.map((expense) =>
-            format(
-              new Date(expense.createdDate),
-              timeRange === "day" ? "HH:mm" : "MM/dd"
-            )
-          )
-        ),
-      ].sort();
-
-      return {
-        labels: allDates,
-        datasets,
-      };
-    } else {
-      // Single expense type view
-      const filteredExpenses = filteredByTime
-        .filter((expense) => expense.expenseTypeName === selectedType)
-        .sort((a, b) => new Date(a.createdDate) - new Date(b.createdDate));
-
-      const typeIndex = expenseTypes.indexOf(selectedType);
-      const colors = generateColors(typeIndex);
-
-      return {
-        labels: filteredExpenses.map((expense) =>
-          format(
-            new Date(expense.createdDate),
-            timeRange === "day" ? "HH:mm" : "MM/dd"
-          )
-        ),
-        datasets: [
-          {
-            label: selectedType,
-            data: filteredExpenses.map((expense) => expense.quantity),
-            borderColor: colors.main,
-            backgroundColor: colors.light,
-            ...getChartTypeOptions(chartType),
-          },
-        ],
-      };
-    }
-  };
-
-  // Enhanced pie chart options
-  const pieOptions = {
+  const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    plugins: {
-      legend: {
-        position: "bottom",
-        labels: {
-          padding: 20,
-          usePointStyle: true,
-          pointStyle: "circle",
-          font: {
-            size: 13,
-            family: "Inter, system-ui, sans-serif",
-            weight: "500",
-          },
-        },
-      },
-      tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        padding: 12,
-        titleFont: {
-          size: 14,
-          weight: "600",
-          family: "Inter, system-ui, sans-serif",
-        },
-        bodyFont: {
-          size: 13,
-          family: "Inter, system-ui, sans-serif",
-        },
-        callbacks: {
-          label: function (context) {
-            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-            const percentage = ((context.parsed * 100) / total).toFixed(1);
-            const value = context.parsed.toLocaleString("en-US", {
-              style: "currency",
-              currency: "USD",
-            });
-            return `${context.label}: ${value} (${percentage}%)`;
-          },
-        },
-      },
-    },
-    cutout: "65%",
-    animation: {
-      animateScale: true,
-      animateRotate: true,
-      duration: 1000,
-    },
-  };
-
-  // Enhanced individual chart options
-  const getChartOptions = () => ({
-    responsive: true,
-    maintainAspectRatio: false,
-    animation: {
-      duration: 750,
-      easing: "easeInOutQuart",
-    },
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
+    interaction: { mode: "index", intersect: false },
     plugins: {
       legend: {
         position: "bottom",
         labels: {
           usePointStyle: true,
           pointStyle: "circle",
-          padding: 20,
-          font: {
-            size: 13,
-            family: "Inter, system-ui, sans-serif",
-            weight: "500",
-          },
+          font: { size: 13, family: "Inter", weight: "500" },
         },
-      },
-      tooltip: {
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        padding: 12,
-        titleFont: {
-          size: 14,
-          weight: "600",
-          family: "Inter, system-ui, sans-serif",
-        },
-        bodyFont: {
-          size: 13,
-          family: "Inter, system-ui, sans-serif",
-        },
-        displayColors: false,
       },
       title: {
         display: true,
@@ -405,11 +227,7 @@ const UtilityDistribution = () => {
           selectedType === "all"
             ? "All Types Consumption Over Time"
             : `${selectedType} Consumption Over Time`,
-        font: {
-          size: 16,
-          family: "Inter, system-ui, sans-serif",
-          weight: "600",
-        },
+        font: { size: 16, family: "Inter", weight: "600" },
         padding: { bottom: 25 },
         color: "#374151",
       },
@@ -417,113 +235,61 @@ const UtilityDistribution = () => {
     scales: {
       y: {
         beginAtZero: true,
-        grid: {
-          color: "rgba(0, 0, 0, 0.06)",
-          drawBorder: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Inter, system-ui, sans-serif",
-          },
-          padding: 8,
-        },
+        ticks: { font: { size: 12 }, padding: 8 },
         title: {
           display: true,
           text: "Quantity",
-          font: {
-            size: 13,
-            family: "Inter, system-ui, sans-serif",
-            weight: "500",
-          },
-          padding: { bottom: 10 },
+          font: { size: 13, weight: "500" },
         },
       },
       x: {
-        grid: {
-          display: false,
-        },
-        ticks: {
-          font: {
-            size: 12,
-            family: "Inter, system-ui, sans-serif",
-          },
-          padding: 8,
-        },
+        ticks: { font: { size: 12 }, padding: 8 },
         title: {
           display: true,
-          text: timeRange === "day" ? "Time" : "Date",
-          font: {
-            size: 13,
-            family: "Inter, system-ui, sans-serif",
-            weight: "500",
-          },
-          padding: { top: 10 },
+          text: "Date",
+          font: { size: 13, weight: "500" },
         },
       },
     },
-  });
+  };
 
   const renderChart = () => {
     const data = getChartData();
-    if (!data) return null;
-
-    switch (chartType) {
-      case "bar":
-        return <Bar data={data} options={getChartOptions()} />;
-      case "area":
-      case "line":
-        return (
-          <Line
-            data={data}
-            options={getChartOptions()}
-            plugins={[
-              {
-                id: "gradientFill",
-                beforeDraw: (chart) => {
-                  if (chartType === "area") {
-                    const ctx = chart.ctx;
-                    data.datasets.forEach((dataset, index) => {
-                      const colors = generateColors(index);
-                      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-                      gradient.addColorStop(0, colors.light);
-                      gradient.addColorStop(1, "rgba(255, 255, 255, 0)");
-                      dataset.backgroundColor = gradient;
-                      // Adjust opacity for better visibility in area charts
-                      if (selectedType === "all") {
-                        dataset.backgroundColor = `rgba(${colors.main
-                          .replace(/[^\d,]/g, "")
-                          .split(",")
-                          .join(", ")}, 0.3)`;
-                      }
-                    });
-                  }
-                },
-              },
-            ]}
-          />
-        );
-      default:
-        return <Line data={data} options={getChartOptions()} />;
-    }
+    return chartType === "bar" ? (
+      <Bar data={data} options={chartOptions} />
+    ) : (
+      <Line data={data} options={chartOptions} />
+    );
   };
 
   return (
     <div className="space-y-6">
-      <Card className="p-6 shadow-lg dark:shadow-none hover:shadow-xl transition-shadow duration-300">
+      {/* Pie Chart Card - commented out for now */}
+      {/* <Card className="p-6 shadow-lg">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-            Overall Utility Distribution
-          </h3>
+          <h3 className="text-lg font-semibold">Overall Utility Distribution</h3>
+          <Select value={pieTimeRange} onValueChange={setPieTimeRange}>
+            <SelectTrigger className="w-40">
+              <SelectValue placeholder="Time Range" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="day">Daily</SelectItem>
+              <SelectItem value="7days">Last 7 Days</SelectItem>
+              <SelectItem value="month">Monthly</SelectItem>
+              <SelectItem value="6months">Last 6 Months</SelectItem>
+              <SelectItem value="year">Yearly</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="h-[400px] flex items-center justify-center">
           <Pie data={getCollectiveData()} options={pieOptions} />
         </div>
-      </Card>
+      </Card> */}
 
-      <Card className="p-6 shadow-lg dark:shadow-none hover:shadow-xl transition-shadow duration-300">
+      {/* Line/Bar Chart */}
+      <Card className="p-6 shadow-lg">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+          <h3 className="text-lg font-semibold">
             Individual Utility Consumption
           </h3>
           <div className="flex gap-4">
@@ -551,12 +317,14 @@ const UtilityDistribution = () => {
               </SelectContent>
             </Select>
             <Select value={timeRange} onValueChange={setTimeRange}>
-              <SelectTrigger className="w-32">
+              <SelectTrigger className="w-40">
                 <SelectValue placeholder="Time Range" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="day">Daily</SelectItem>
+                <SelectItem value="7days">Last 7 Days</SelectItem>
                 <SelectItem value="month">Monthly</SelectItem>
+                <SelectItem value="6months">Last 6 Months</SelectItem>
                 <SelectItem value="year">Yearly</SelectItem>
               </SelectContent>
             </Select>

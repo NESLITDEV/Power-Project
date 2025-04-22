@@ -401,7 +401,6 @@ export const MENU_SIDEBAR = [
         path: "/utility/ai-analysis",
       },
     ],
-    
   },
   {
     heading: "Billing",

@@ -33,7 +33,6 @@ const Demo1LightSidebarContent = () => {
             expensesResponse.data.map((expense) => expense.expenseTypeName)
           ),
         ];
-        console.log(uniqueTypes);
         setExpenseTypes(uniqueTypes);
       } catch (error) {
         console.error("Error fetching data:", error);

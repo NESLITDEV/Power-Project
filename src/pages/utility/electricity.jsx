@@ -79,7 +79,6 @@ const ElectricityUsage = ({
     }
 
     try {
-      console.log("DATE SELECTED:", formData.date)
       const response = await axios.post(
         `${import.meta.env.VITE_APP_API_URL}/user-expenses/Create-User-Expense`,
         {
@@ -97,7 +96,6 @@ const ElectricityUsage = ({
         }
       );
 
-      console.log("API Response:", response.data);
       toast.success(
         intl.formatMessage(
           { id: "UTILITY.ELECTRICITY.SUCCESS.RECORDED" },

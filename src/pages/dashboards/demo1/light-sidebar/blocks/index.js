@@ -9,5 +9,6 @@ export { UtilityDistribution } from "./UtilityDistribution";
 // New components
 import SummarySection from "./SummarySection";
 import UtilityPieChart from "./UtilityPieChart";
+import AIAnalysis from "./AIAnalysis";
 
-export { SummarySection, UtilityPieChart };
+export { SummarySection, UtilityPieChart, AIAnalysis };

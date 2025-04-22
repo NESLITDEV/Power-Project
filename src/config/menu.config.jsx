@@ -396,6 +396,10 @@ export const MENU_SIDEBAR = [
         title: "My Expenses",
         path: "/utility/my-expenses",
       },
+      {
+        title: "AI Analysis",
+        path: "/utility/ai-analysis",
+      },
     ],
   },
   {
@@ -562,6 +566,10 @@ export const MENU_MEGA = [
   {
     title: "Utility Expenses",
     path: "/utility/my-expenses",
+  },
+  {
+    title: "AI Analysis",
+    path: "/utility/ai-analysis",
   },
   {
     title: "Profiles",

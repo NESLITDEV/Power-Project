@@ -50,7 +50,6 @@ const ExpenseTable = () => {
           }
         );
         setExpenses(response.data);
-        console.log(response.data);
         setFilteredExpenses(response.data);
       } catch (error) {
         console.error("Error fetching expenses:", error);

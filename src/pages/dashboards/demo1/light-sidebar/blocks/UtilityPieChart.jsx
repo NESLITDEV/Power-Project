@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -10,19 +9,18 @@ import {
 import { Pie } from "react-chartjs-2";
 import { format } from "date-fns";
 
-// Color palette generator
 const generateColors = (index) => {
   const palettes = [
-    { main: "rgb(56, 189, 248)", light: "rgba(56, 189, 248, 0.5)" },
-    { main: "rgb(244, 63, 94)", light: "rgba(244, 63, 94, 0.5)" },
-    { main: "rgb(16, 185, 129)", light: "rgba(16, 185, 129, 0.5)" },
-    { main: "rgb(168, 85, 247)", light: "rgba(168, 85, 247, 0.5)" },
-    { main: "rgb(245, 158, 11)", light: "rgba(245, 158, 11, 0.5)" },
-    { main: "rgb(236, 72, 153)", light: "rgba(236, 72, 153, 0.5)" },
-    { main: "rgb(20, 184, 166)", light: "rgba(20, 184, 166, 0.5)" },
-    { main: "rgb(234, 88, 12)", light: "rgba(234, 88, 12, 0.5)" },
-    { main: "rgb(99, 102, 241)", light: "rgba(99, 102, 241, 0.5)" },
-    { main: "rgb(220, 38, 38)", light: "rgba(220, 38, 38, 0.5)" },
+    { main: "rgb(45, 94, 255)", light: "rgba(45, 94, 255, 0.7)" },
+    { main: "rgb(255, 77, 109)", light: "rgba(255, 77, 109, 0.7)" },
+    { main: "rgb(0, 210, 122)", light: "rgba(0, 210, 122, 0.7)" },
+    { main: "rgb(192, 70, 255)", light: "rgba(192, 70, 255, 0.7)" },
+    { main: "rgb(255, 168, 0)", light: "rgba(255, 168, 0, 0.7)" },
+    { main: "rgb(255, 64, 212)", light: "rgba(255, 64, 212, 0.7)" },
+    { main: "rgb(0, 208, 206)", light: "rgba(0, 208, 206, 0.7)" },
+    { main: "rgb(255, 126, 34)", light: "rgba(255, 126, 34, 0.7)" },
+    { main: "rgb(99, 122, 255)", light: "rgba(99, 122, 255, 0.7)" },
+    { main: "rgb(255, 45, 85)", light: "rgba(255, 45, 85, 0.7)" },
   ];
   return palettes[index % palettes.length];
 };
@@ -33,7 +31,6 @@ const UtilityPieChart = ({ expenses }) => {
   const getFilteredData = () => {
     const now = new Date();
     let cutoff = new Date();
-
     switch (pieTimeRange) {
       case "day":
         cutoff.setDate(now.getDate() - 1);
@@ -49,8 +46,6 @@ const UtilityPieChart = ({ expenses }) => {
         break;
       case "year":
         cutoff.setFullYear(now.getFullYear() - 1);
-        break;
-      default:
         break;
     }
 
@@ -121,12 +116,15 @@ const UtilityPieChart = ({ expenses }) => {
     animation: { animateScale: true, animateRotate: true, duration: 800 },
   };
 
+  // Check if there's no data
+  const data = getFilteredData();
+  if (data.labels.length === 0) {
+    return <div>No data found</div>;
+  }
+
   return (
-    <Card className="p-4 shadow-sm">
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">
-          Overall Utility Distribution
-        </h3>
+    <div className="w-full">
+      <div className="flex justify-end mb-2">
         <Select value={pieTimeRange} onValueChange={setPieTimeRange}>
           <SelectTrigger className="w-36 h-9 text-sm">
             <SelectValue placeholder="Time Range" />
@@ -140,10 +138,10 @@ const UtilityPieChart = ({ expenses }) => {
           </SelectContent>
         </Select>
       </div>
-      <div className="h-[180px] sm:h-[200px] flex items-center justify-center">
-        <Pie data={getFilteredData()} options={pieOptions} />
+      <div className="h-[240px] sm:h-[260px] flex items-center justify-center">
+        <Pie data={data} options={pieOptions} />
       </div>
-    </Card>
+    </div>
   );
 };
 

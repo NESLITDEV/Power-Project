@@ -23,7 +23,16 @@ import {
 import { Pie, Line, Bar } from "react-chartjs-2";
 import axios from "axios";
 import { useAuthContext } from "@/auth";
-import { format } from "date-fns";
+import {
+  format,
+  parseISO,
+  isValid,
+  subDays,
+  subMonths,
+  subYears,
+  startOfDay,
+  endOfDay,
+} from "date-fns";
 
 ChartJS.register(
   ArcElement,
@@ -47,28 +56,24 @@ const UtilityDistribution = () => {
   const [expenseTypes, setExpenseTypes] = useState([]);
   const { auth } = useAuthContext();
 
+  // Enhanced color palette generator with more vibrant colors
   const generateColors = (index) => {
     const colorPalettes = [
-      {
-        main: "rgb(56, 189, 248)",
-        light: "rgba(56, 189, 248, 0.5)",
-      },
-      {
-        main: "rgb(244, 63, 94)",
-        light: "rgba(244, 63, 94, 0.5)",
-      },
-      {
-        main: "rgb(16, 185, 129)",
-        light: "rgba(16, 185, 129, 0.5)",
-      },
-      {
-        main: "rgb(168, 85, 247)",
-        light: "rgba(168, 85, 247, 0.5)",
-      },
-      {
-        main: "rgb(245, 158, 11)",
-        light: "rgba(245, 158, 11, 0.5)",
-      },
+      { main: "rgb(45, 94, 255)", light: "rgba(45, 94, 255, 0.7)" }, // Electric Blue
+      { main: "rgb(255, 77, 109)", light: "rgba(255, 77, 109, 0.7)" }, // Vivid Crimson
+      { main: "rgb(0, 210, 122)", light: "rgba(0, 210, 122, 0.7)" }, // Vibrant Green
+      { main: "rgb(192, 70, 255)", light: "rgba(192, 70, 255, 0.7)" }, // Bright Purple
+      { main: "rgb(255, 168, 0)", light: "rgba(255, 168, 0, 0.7)" }, // Radiant Orange
+      { main: "rgb(255, 64, 212)", light: "rgba(255, 64, 212, 0.7)" }, // Hot Pink
+      { main: "rgb(0, 208, 206)", light: "rgba(0, 208, 206, 0.7)" }, // Teal
+      { main: "rgb(255, 126, 34)", light: "rgba(255, 126, 34, 0.7)" }, // Sunrise Orange
+      { main: "rgb(99, 122, 255)", light: "rgba(99, 122, 255, 0.7)" }, // Periwinkle Blue
+      { main: "rgb(255, 45, 85)", light: "rgba(255, 45, 85, 0.7)" }, // Bright Red
+      { main: "rgb(141, 255, 96)", light: "rgba(141, 255, 96, 0.7)" }, // Lime Green
+      { main: "rgb(126, 87, 255)", light: "rgba(126, 87, 255, 0.7)" }, // Indigo
+      { main: "rgb(255, 220, 0)", light: "rgba(255, 220, 0, 0.7)" }, // Golden Yellow
+      { main: "rgb(255, 0, 153)", light: "rgba(255, 0, 153, 0.7)" }, // Magenta
+      { main: "rgb(0, 255, 179)", light: "rgba(0, 255, 179, 0.7)" }, // Aquamarine
     ];
     return colorPalettes[index % colorPalettes.length];
   };
@@ -84,9 +89,43 @@ const UtilityDistribution = () => {
             },
           }
         );
-        setExpenses(response.data);
-        const types = [...new Set(response.data.map((e) => e.expenseTypeName))];
+
+        console.log("Raw expenses data:", response.data);
+
+        // Normalize the expenses data to extract just the date portion
+        const normalizedExpenses = response.data
+          .map((expense) => {
+            try {
+              // Parse the ISO date string
+              const dateObj = parseISO(expense.expenseForDate);
+
+              // Format date as YYYY-MM-DD string to remove time component
+              const dateOnly = format(dateObj, "yyyy-MM-dd");
+
+              // Return expense with normalized date
+              return {
+                ...expense,
+                // Keep original expenseForDate for reference
+                originalExpenseForDate: expense.expenseForDate,
+                // Add normalized date (without time component)
+                expenseDate: dateOnly,
+                // Parse date object for easy comparisons
+                expenseDateObj: dateObj,
+              };
+            } catch (error) {
+              console.error("Error processing date:", expense.expenseForDate);
+              return null;
+            }
+          })
+          .filter((expense) => expense !== null);
+
+        setExpenses(normalizedExpenses);
+        const types = [
+          ...new Set(normalizedExpenses.map((e) => e.expenseTypeName)),
+        ];
         setExpenseTypes(types);
+
+        console.log("Normalized expenses:", normalizedExpenses);
       } catch (error) {
         console.error("Error fetching expenses:", error);
       }
@@ -95,117 +134,180 @@ const UtilityDistribution = () => {
     if (auth?.id) fetchExpenses();
   }, [auth?.id, auth?.token]);
 
-  // ⛔️ Commented out Pie Chart logic for future use
-  // const getCollectiveData = () => {
-  //   const typeData = {};
-  //   const now = new Date();
-  //   let cutoff = new Date();
+  // Get date range bounds for the selected time filter
+  const getDateRangeBounds = () => {
+    const today = new Date();
+    let startDate;
 
-  //   switch (pieTimeRange) {
-  //     case "day":
-  //       cutoff.setDate(now.getDate() - 1);
-  //       break;
-  //     case "7days":
-  //       cutoff.setDate(now.getDate() - 7);
-  //       break;
-  //     case "month":
-  //       cutoff.setMonth(now.getMonth() - 1);
-  //       break;
-  //     case "6months":
-  //       cutoff.setMonth(now.getMonth() - 6);
-  //       break;
-  //     case "year":
-  //       cutoff.setFullYear(now.getFullYear() - 1);
-  //       break;
-  //   }
-
-  //   const filtered = expenses.filter(
-  //     (e) => new Date(e.expenseForDate) >= cutoff
-  //   );
-
-  //   filtered.forEach((e) => {
-  //     if (!typeData[e.expenseTypeName]) {
-  //       typeData[e.expenseTypeName] = 0;
-  //     }
-  //     typeData[e.expenseTypeName] += e.totalCost;
-  //   });
-
-  //   return {
-  //     labels: Object.keys(typeData),
-  //     datasets: [
-  //       {
-  //         data: Object.values(typeData),
-  //         backgroundColor: Object.keys(typeData).map((_, i) => generateColors(i).light),
-  //         borderColor: Object.keys(typeData).map((_, i) => generateColors(i).main),
-  //         borderWidth: 2,
-  //         hoverBorderWidth: 4,
-  //         hoverOffset: 15,
-  //         borderRadius: 3,
-  //       },
-  //     ],
-  //   };
-  // };
-
-  const getChartData = () => {
-    const cutoffDate = new Date();
     switch (timeRange) {
       case "day":
-        cutoffDate.setDate(cutoffDate.getDate() - 1);
-        break;
+        // Today only
+        startDate = startOfDay(today);
+        return { startDate, endDate: endOfDay(today) };
+
       case "7days":
-        cutoffDate.setDate(cutoffDate.getDate() - 7);
-        break;
+        // Last 7 days
+        startDate = startOfDay(subDays(today, 6)); // Start 6 days ago (inclusive of today = 7 days)
+        return { startDate, endDate: endOfDay(today) };
+
       case "month":
-        cutoffDate.setMonth(cutoffDate.getMonth() - 1);
-        break;
+        // Last 30 days
+        startDate = startOfDay(subDays(today, 29)); // Start 29 days ago (inclusive of today = 30 days)
+        return { startDate, endDate: endOfDay(today) };
+
       case "6months":
-        cutoffDate.setMonth(cutoffDate.getMonth() - 6);
-        break;
+        // Last 6 months
+        startDate = startOfDay(subMonths(today, 6));
+        return { startDate, endDate: endOfDay(today) };
+
       case "year":
-        cutoffDate.setFullYear(cutoffDate.getFullYear() - 1);
-        break;
+        // Last 365 days
+        startDate = startOfDay(subYears(today, 1));
+        return { startDate, endDate: endOfDay(today) };
+
+      default:
+        // Default to last 30 days
+        startDate = startOfDay(subDays(today, 29));
+        return { startDate, endDate: endOfDay(today) };
+    }
+  };
+
+  // Format dates for display on the chart
+  const formatDateForDisplay = (dateString) => {
+    try {
+      const date = parseISO(dateString);
+
+      switch (timeRange) {
+        case "day":
+        case "7days":
+        case "month":
+          return format(date, "MM/dd/yyyy");
+        case "6months":
+        case "year":
+          return format(date, "MM/dd/yyyy");
+        default:
+          return format(date, "MM/dd/yyyy");
+      }
+    } catch (error) {
+      console.error("Error formatting date for display:", dateString, error);
+      return dateString || "Invalid Date";
+    }
+  };
+
+  const getChartData = () => {
+    // Get date range for filtering
+    const { startDate, endDate } = getDateRangeBounds();
+    console.log(
+      `Date range: ${startDate.toISOString()} to ${endDate.toISOString()}`
+    );
+
+    // Filter expenses by date range
+    const filtered = expenses.filter((expense) => {
+      const expenseDate = expense.expenseDateObj;
+      return expenseDate >= startDate && expenseDate <= endDate;
+    });
+
+    console.log(
+      `Filtered ${filtered.length} out of ${expenses.length} expenses`
+    );
+
+    // Sort expenses by date
+    filtered.sort((a, b) => a.expenseDateObj - b.expenseDateObj);
+
+    // Create an array of unique dates within the range
+    const allDates = [...new Set(filtered.map((e) => e.expenseDate))].sort();
+    console.log("Unique dates for chart:", allDates);
+
+    // Format dates for display
+    const formattedDates = allDates.map(formatDateForDisplay);
+
+    // If a specific expense type is selected, filter the datasets
+    let typesToDisplay = expenseTypes;
+    if (selectedType !== "all") {
+      typesToDisplay = expenseTypes.filter((type) => type === selectedType);
     }
 
-    const filtered = expenses.filter(
-      (e) => new Date(e.expenseForDate) >= cutoffDate
-    );
-    const allDates = [
-      ...new Set(
-        filtered.map((e) =>
-          format(
-            new Date(e.expenseForDate),
-            timeRange === "year" || timeRange === "6months" ? "MM" : "MM/dd"
-          )
-        )
-      ),
-    ];
-
-    const datasets = expenseTypes.map((type, index) => {
+    const datasets = typesToDisplay.map((type, index) => {
       const typeExpenses = filtered.filter((e) => e.expenseTypeName === type);
       const colors = generateColors(index);
+
+      const dataPoints = allDates.map((dateString) => {
+        const matchingExpenses = typeExpenses.filter(
+          (e) => e.expenseDate === dateString
+        );
+        const totalQuantity = matchingExpenses.reduce(
+          (sum, e) => sum + e.quantity,
+          0
+        );
+        return totalQuantity;
+      });
+
       return {
         label: type,
-        data: allDates.map((label) =>
-          typeExpenses
-            .filter(
-              (e) =>
-                format(
-                  new Date(e.expenseForDate),
-                  timeRange === "year" || timeRange === "6months"
-                    ? "MM"
-                    : "MM/dd"
-                ) === label
-            )
-            .reduce((sum, e) => sum + e.quantity, 0)
-        ),
+        data: dataPoints,
         borderColor: colors.main,
         backgroundColor: colors.light,
+        borderWidth: 3,
+        pointRadius: 4,
+        pointBorderWidth: 2,
+        pointHoverRadius: 6,
         fill: chartType === "area",
         tension: 0.4,
       };
     });
 
-    return { labels: allDates.sort(), datasets };
+    console.log(`Chart data for ${selectedType}:`, {
+      selectedType,
+      dateRange: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
+      dataPointCount: allDates.length,
+      datasetCount: datasets.length,
+    });
+
+    return { labels: formattedDates, datasets };
+  };
+
+  // Determine if we need to make the chart scrollable
+  const determineScrollable = () => {
+    const { startDate, endDate } = getDateRangeBounds();
+
+    // Filter and count unique dates in the date range
+    const dateCount = new Set(
+      expenses
+        .filter(
+          (expense) =>
+            expense.expenseDateObj >= startDate &&
+            expense.expenseDateObj <= endDate
+        )
+        .map((e) => e.expenseDate)
+    ).size;
+
+    // If we have more than 10 dates, enable scrolling
+    return dateCount > 10;
+  };
+
+  // Calculate the width based on number of data points
+  const calculateChartWidth = () => {
+    const { startDate, endDate } = getDateRangeBounds();
+
+    // Count unique dates in the range
+    const dateCount = new Set(
+      expenses
+        .filter(
+          (expense) =>
+            expense.expenseDateObj >= startDate &&
+            expense.expenseDateObj <= endDate
+        )
+        .map((e) => e.expenseDate)
+    ).size;
+
+    // For 6 months and year views, ensure minimum width regardless of data point count
+    if (timeRange === "6months" || timeRange === "year") {
+      // Use a fixed width for longer time periods to ensure proper display
+      return Math.max(1200, dateCount * 45);
+    }
+
+    // For shorter time ranges, use the data point based calculation
+    return Math.max(600, dateCount * 45);
   };
 
   const chartOptions = {
@@ -219,6 +321,7 @@ const UtilityDistribution = () => {
           usePointStyle: true,
           pointStyle: "circle",
           font: { size: 13, family: "Inter", weight: "500" },
+          padding: 15,
         },
       },
       title: {
@@ -231,6 +334,22 @@ const UtilityDistribution = () => {
         padding: { bottom: 25 },
         color: "#374151",
       },
+      tooltip: {
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleFont: { size: 14 },
+        bodyFont: { size: 13 },
+        padding: 12,
+        cornerRadius: 8,
+        usePointStyle: true,
+        callbacks: {
+          title: (context) => {
+            return context[0].label;
+          },
+          label: (context) => {
+            return `${context.dataset.label}: ${context.parsed.y}`;
+          },
+        },
+      },
     },
     scales: {
       y: {
@@ -241,24 +360,78 @@ const UtilityDistribution = () => {
           text: "Quantity",
           font: { size: 13, weight: "500" },
         },
+        grid: {
+          color: "rgba(0, 0, 0, 0.05)",
+        },
       },
       x: {
-        ticks: { font: { size: 12 }, padding: 8 },
+        ticks: {
+          font: { size: 12 },
+          padding: 8,
+          maxRotation: 45,
+          minRotation: 45,
+        },
         title: {
           display: true,
           text: "Date",
           font: { size: 13, weight: "500" },
         },
+        grid: {
+          color: "rgba(0, 0, 0, 0.05)",
+        },
       },
     },
   };
 
+  // Update options for scrollable charts
+  if (determineScrollable()) {
+    chartOptions.scales.x.ticks.autoSkip = false;
+    chartOptions.scales.x.ticks.maxRotation = 45;
+  }
+
   const renderChart = () => {
     const data = getChartData();
-    return chartType === "bar" ? (
-      <Bar data={data} options={chartOptions} />
-    ) : (
-      <Line data={data} options={chartOptions} />
+
+    // Always make the chart scrollable for 6 months and year views
+    const shouldForceScroll = timeRange === "6months" || timeRange === "year";
+    const isScrollable = shouldForceScroll || determineScrollable();
+
+    const chartWidth = isScrollable ? calculateChartWidth() : "100%";
+
+    // Check if there's no data to display
+    const hasNoData =
+      data.labels.length === 0 ||
+      data.datasets.length === 0 ||
+      data.datasets.every((dataset) =>
+        dataset.data.every((value) => value === 0)
+      );
+
+    if (hasNoData) {
+      return (
+        <div className="flex flex-col items-center justify-center h-[400px] w-full">
+          <div className="text-gray-400 text-2xl mb-2">No data found</div>
+          <p className="text-gray-500">
+            {selectedType === "all"
+              ? `No expense data available for the selected time period (${timeRange}).`
+              : `No ${selectedType} expense data available for the selected time period (${timeRange}).`}
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <div
+        className={`${isScrollable ? "overflow-x-auto" : ""} w-full`}
+        style={{ minHeight: "400px" }}
+      >
+        <div style={{ width: chartWidth, height: "400px" }}>
+          {chartType === "bar" ? (
+            <Bar data={data} options={chartOptions} />
+          ) : (
+            <Line data={data} options={chartOptions} />
+          )}
+        </div>
+      </div>
     );
   };
 
@@ -321,18 +494,16 @@ const UtilityDistribution = () => {
                 <SelectValue placeholder="Time Range" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="day">Daily</SelectItem>
+                <SelectItem value="day">Today Only</SelectItem>
                 <SelectItem value="7days">Last 7 Days</SelectItem>
-                <SelectItem value="month">Monthly</SelectItem>
+                <SelectItem value="month">Last 30 Days</SelectItem>
                 <SelectItem value="6months">Last 6 Months</SelectItem>
-                <SelectItem value="year">Yearly</SelectItem>
+                <SelectItem value="year">Last Year</SelectItem>
               </SelectContent>
             </Select>
           </div>
         </div>
-        <div className="h-[400px] flex items-center justify-center">
-          {renderChart()}
-        </div>
+        {renderChart()}
       </Card>
     </div>
   );

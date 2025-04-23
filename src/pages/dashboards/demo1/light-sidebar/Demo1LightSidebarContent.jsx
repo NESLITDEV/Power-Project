@@ -89,22 +89,37 @@ const Demo1LightSidebarContent = () => {
       {
         bg: "bg-blue-100 dark:bg-blue-900/20",
         text: "text-blue-600 dark:text-blue-400",
+        accent: "border-blue-500",
+        highlight: "bg-blue-50 dark:bg-blue-900/10",
+        light: "text-blue-500",
       },
       {
         bg: "bg-green-100 dark:bg-green-900/20",
         text: "text-green-600 dark:text-green-400",
+        accent: "border-green-500",
+        highlight: "bg-green-50 dark:bg-green-900/10",
+        light: "text-green-500",
       },
       {
         bg: "bg-yellow-100 dark:bg-yellow-900/20",
         text: "text-yellow-600 dark:text-yellow-400",
+        accent: "border-yellow-500",
+        highlight: "bg-yellow-50 dark:bg-yellow-900/10",
+        light: "text-yellow-500",
       },
       {
         bg: "bg-red-100 dark:bg-red-900/20",
         text: "text-red-600 dark:text-red-400",
+        accent: "border-red-500",
+        highlight: "bg-red-50 dark:bg-red-900/10",
+        light: "text-red-500",
       },
       {
         bg: "bg-indigo-100 dark:bg-indigo-900/20",
         text: "text-indigo-600 dark:text-indigo-400",
+        accent: "border-indigo-500",
+        highlight: "bg-indigo-50 dark:bg-indigo-900/10",
+        light: "text-indigo-500",
       },
     ];
     return colors[index % colors.length];
@@ -165,12 +180,102 @@ const Demo1LightSidebarContent = () => {
     };
   };
 
+  // Get detailed stats for expense cards
+  const getCardStats = (expenseTypeName) => {
+    const utilityExpenses = expenses.filter(
+      (expense) => expense.expenseTypeName === expenseTypeName
+    );
+
+    if (utilityExpenses.length === 0) {
+      return {
+        avgCost: 0,
+        totalCost: 0,
+        quantity: 0,
+        change: 0,
+        costChange: 0,
+        lastReading: "N/A",
+        lastUpdate: "N/A",
+      };
+    }
+
+    // Sort expenses by date
+    const sortedExpenses = [...utilityExpenses].sort(
+      (a, b) => new Date(b.createdDate) - new Date(a.createdDate)
+    );
+
+    // Calculate total cost for this expense type
+    const totalCost = utilityExpenses.reduce(
+      (sum, expense) => sum + expense.totalCost,
+      0
+    );
+
+    // Calculate average cost per unit
+    const avgCost =
+      totalCost /
+      utilityExpenses.reduce((sum, expense) => sum + expense.quantity, 0);
+
+    // Calculate consumption change
+    let change = 0;
+    if (sortedExpenses.length >= 2) {
+      const current = sortedExpenses[0].quantity;
+      const previous = sortedExpenses[1].quantity;
+      change = ((current - previous) / previous) * 100;
+    }
+
+    // Calculate cost change
+    let costChange = 0;
+    if (sortedExpenses.length >= 2) {
+      const current = sortedExpenses[0].totalCost;
+      const previous = sortedExpenses[1].totalCost;
+      costChange = ((current - previous) / previous) * 100;
+    }
+
+    // Format the last update date
+    const lastUpdate = sortedExpenses[0]?.createdDate
+      ? new Date(sortedExpenses[0].createdDate).toLocaleDateString()
+      : "N/A";
+
+    // Total quantity
+    const quantity = utilityExpenses.reduce(
+      (sum, expense) => sum + expense.quantity,
+      0
+    );
+
+    return {
+      avgCost,
+      totalCost,
+      quantity,
+      change,
+      costChange,
+      lastReading:
+        sortedExpenses[0]?.quantity?.toLocaleString() +
+        " " +
+        getUnit(expenseTypeName),
+      lastUpdate,
+    };
+  };
+
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev >= expenseTypes.length - 1 ? 0 : prev + 1));
+    setCurrentSlide((prev) => {
+      // If we're at the last or second-to-last item, wrap back to 0
+      if (prev >= expenseTypes.length - 2) {
+        return 0;
+      }
+      return prev + 1;
+    });
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev <= 0 ? expenseTypes.length - 1 : prev - 1));
+    setCurrentSlide((prev) => {
+      // If we're at the first item, wrap to the appropriate position for the last item
+      if (prev <= 0) {
+        // If odd number of types, go to second-to-last, else go to last
+        return expenseTypes.length % 2 === 0
+          ? expenseTypes.length - 2
+          : expenseTypes.length - 1;
+      }
+      return prev - 1;
+    });
   };
 
   return (
@@ -178,7 +283,7 @@ const Demo1LightSidebarContent = () => {
       {/* Channel Stats Section with Carousel */}
       <div className="relative">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {[1, 2, 3].map((index) => (
               <div
                 key={index}
@@ -200,97 +305,147 @@ const Demo1LightSidebarContent = () => {
           </div>
         ) : (
           <>
-            <div className="overflow-hidden">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {/* 1️⃣ Total Cost */}
-                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-900/20 rounded-lg">
-                        <KeenIcon
-                          icon="dollar"
-                          className="text-purple-600 dark:text-purple-400"
-                        />
-                      </div>
-                      <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        <FormattedMessage id="DASHBOARD.TOTAL_COST" />
-                      </h3>
+            {/* 🧮 Fixed: Total + Pie Chart */}
+            <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 items-start">
+              <div className="col-span-1 lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+                <div className="h-[280px] w-full">
+                  <UtilityPieChart expenses={expenses} />
+                </div>
+              </div>
+              {/* 🧮 Total Cost */}
+              <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 flex flex-col justify-between min-h-[280px] border-2 border-purple-300 dark:border-purple-800">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-900/20 rounded-lg">
+                      <KeenIcon
+                        icon="dollar"
+                        className="text-purple-600 dark:text-purple-400"
+                      />
                     </div>
-                    <span className="text-sm text-yellow-500 font-medium">
-                      <FormattedMessage id="DASHBOARD.ALL_TYPES" />
-                    </span>
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                      <FormattedMessage id="DASHBOARD.TOTAL_COST" />
+                    </h3>
                   </div>
-                  <div className="space-y-2">
-                    <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                      ${totalCost.toLocaleString()}
-                    </div>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      <FormattedMessage id="DASHBOARD.TOTAL_EXPENSES" />
-                    </p>
+                  <span className="text-sm text-purple-500 font-medium">
+                    <FormattedMessage id="DASHBOARD.ALL_TYPES" />
+                  </span>
+                </div>
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                  ${totalCost.toLocaleString()}
+                </div>
+                <div className="bg-purple-50 dark:bg-purple-900/10 rounded-md p-2 mt-3 mb-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                      Total Expenses:
+                    </span>
+                    <span className="text-sm font-bold">{expenses.length}</span>
                   </div>
                 </div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Last Update:{" "}
+                  {expenses.length > 0
+                    ? new Date(
+                        Math.max(
+                          ...expenses.map((e) => new Date(e.createdDate))
+                        )
+                      ).toLocaleDateString()
+                    : "N/A"}
+                </p>
+              </div>
 
-                {/* 2️⃣ Expense Type - ONLY ONE DISPLAYED AT A TIME */}
-                {expenseTypes.length > 0 &&
-                  (() => {
-                    const expenseType = expenseTypes[currentSlide]; // ✅ Direct access
-                    if (!expenseType) return null;
-
-                    const stats = getUtilityStats(expenseType);
-                    const colorClasses = getIconColorClasses(currentSlide);
-
-                    return (
-                      <div
-                        key={expenseType}
-                        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 transition-all duration-200 hover:shadow-md"
-                      >
-                        <div className="flex items-center justify-between mb-4">
+              {/* 💸 Expense Cards */}
+              {expenseTypes
+                .slice(currentSlide, currentSlide + 2)
+                .map((expenseType, index) => {
+                  const stats = getUtilityStats(expenseType);
+                  const detailedStats = getCardStats(expenseType);
+                  const colorClasses = getIconColorClasses(index);
+                  return (
+                    <div
+                      key={expenseType}
+                      className={`col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 transition-all duration-200 hover:shadow-md min-h-[280px] flex flex-col justify-between border-2 ${colorClasses.accent}`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center space-x-3">
                             <div
-                              className={`w-12 h-12 flex items-center justify-center ${colorClasses.bg} rounded-lg`}
+                              className={`w-10 h-10 flex items-center justify-center ${colorClasses.bg} rounded-lg`}
                             >
                               <KeenIcon
                                 icon="electricity"
                                 className={colorClasses.text}
                               />
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">
                               {expenseType}
                             </h3>
                           </div>
                           <span
                             className={`text-sm font-medium ${
-                              stats.change >= 0
+                              detailedStats.change >= 0
                                 ? "text-green-500"
                                 : "text-red-500"
                             }`}
                           >
-                            {stats.change > 0 ? "+" : ""}
-                            {stats.change.toFixed(1)}%
+                            {detailedStats.change > 0 ? "+" : ""}
+                            {detailedStats.change.toFixed(
+                              1
+                            )}%
                           </span>
                         </div>
-                        <div className="space-y-2">
-                          <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                            {stats.quantity.toLocaleString()}{" "}
-                            {getUnit(expenseType)}
+                        <div className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                          {detailedStats.quantity.toLocaleString()}{" "}
+                          {getUnit(expenseType)}
+                        </div>
+
+                        <div
+                          className={`text-xs rounded-md p-2 mb-3 ${colorClasses.highlight} flex items-center justify-between`}
+                        >
+                          <span className="font-medium">Total Cost:</span>
+                          <span className="font-bold">
+                            $
+                            {detailedStats.totalCost.toLocaleString(undefined, {
+                              maximumFractionDigits: 2,
+                            })}
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 text-xs">
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Avg. Cost:</span>
+                            <span
+                              className={`font-medium ${colorClasses.light}`}
+                            >
+                              $
+                              {detailedStats.avgCost.toLocaleString(undefined, {
+                                maximumFractionDigits: 2,
+                              })}
+                              /{getUnit(expenseType)}
+                            </span>
                           </div>
-                          <p className="text-sm text-gray-500 dark:text-gray-400">
-                            <FormattedMessage id="DASHBOARD.MONTHLY_CONSUMPTION" />
-                          </p>
+                          <div className="flex justify-between">
+                            <span className="text-gray-500">Last Reading:</span>
+                            <span className="font-medium">
+                              {detailedStats.lastReading}
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    );
-                  })()}
-
-                {/* 3️⃣ Pie Chart */}
-                {expenseTypes.length > 0 && (
-                  <UtilityPieChart expenses={expenses} />
-                )}
-              </div>
+                      <div>
+                        <div className="border-t border-gray-100 dark:border-gray-700 pt-2 mt-2 flex justify-between text-xs">
+                          <span className="text-gray-500">Last Update:</span>
+                          <span className="text-gray-600 dark:text-gray-400">
+                            {detailedStats.lastUpdate}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
 
-            {/* ⏩ Carousel Controls (only if more than 1) */}
-            {expenseTypes.length > 1 && (
+            {/* ⏩ Carousel Controls */}
+            {expenseTypes.length > 2 && (
               <div className="flex justify-between mt-4">
                 <button
                   onClick={prevSlide}
@@ -299,19 +454,22 @@ const Demo1LightSidebarContent = () => {
                   <KeenIcon icon="arrow-left" />
                 </button>
                 <div className="flex space-x-2">
-                  {Array.from({ length: expenseTypes.length }).map(
-                    (_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentSlide(index)}
-                        className={`w-2 h-2 rounded-full ${
-                          currentSlide === index
-                            ? "bg-primary"
-                            : "bg-gray-300 dark:bg-gray-600"
-                        }`}
-                      />
-                    )
-                  )}
+                  {Array.from({
+                    length: expenseTypes.length - 1,
+                  }).map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setCurrentSlide(index)}
+                      className={`w-2 h-2 rounded-full ${
+                        currentSlide === index ||
+                        // Special case for the last dot
+                        (index === expenseTypes.length - 2 &&
+                          currentSlide === expenseTypes.length - 1)
+                          ? "bg-primary"
+                          : "bg-gray-300 dark:bg-gray-600"
+                      }`}
+                    />
+                  ))}
                 </div>
                 <button
                   onClick={nextSlide}

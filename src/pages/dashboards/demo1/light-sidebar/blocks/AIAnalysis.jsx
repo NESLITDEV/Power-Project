@@ -20,29 +20,24 @@ const AIAnalysis = () => {
             },
           }
         );
-        console.log("API Response received:", response.data);
 
         // Clean up the HTML content by removing the first and last lines
         let cleanedHtml = response.data;
         if (cleanedHtml) {
           // Split by line breaks
           const lines = cleanedHtml.split("\n");
-          console.log("Original line count:", lines.length);
 
           // Remove first line if it's ```html and last line if it's ```
           if (lines.length > 2) {
             if (lines[0].trim() === "```html") {
-              console.log("Removing first line:", lines[0]);
               lines.shift(); // Remove first line
             }
             if (lines[lines.length - 1].trim() === "```") {
-              console.log("Removing last line:", lines[lines.length - 1]);
               lines.pop(); // Remove last line
             }
             cleanedHtml = lines.join("\n");
           }
 
-          console.log("Cleaned HTML:", cleanedHtml);
         }
 
         // Set the cleaned HTML content
@@ -58,7 +53,6 @@ const AIAnalysis = () => {
 
     // Make sure auth and auth.id are available before making the API call
     if (auth?.token && auth?.id) {
-      console.log("Fetching AI analysis for user:", auth.id);
       fetchAIAnalysis();
     } else {
       console.error("Auth token or user ID missing");

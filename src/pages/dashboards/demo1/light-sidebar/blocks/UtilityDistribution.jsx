@@ -90,7 +90,6 @@ const UtilityDistribution = () => {
           }
         );
 
-        console.log("Raw expenses data:", response.data);
 
         // Normalize the expenses data to extract just the date portion
         const normalizedExpenses = response.data
@@ -125,7 +124,6 @@ const UtilityDistribution = () => {
         ];
         setExpenseTypes(types);
 
-        console.log("Normalized expenses:", normalizedExpenses);
       } catch (error) {
         console.error("Error fetching expenses:", error);
       }
@@ -197,9 +195,6 @@ const UtilityDistribution = () => {
   const getChartData = () => {
     // Get date range for filtering
     const { startDate, endDate } = getDateRangeBounds();
-    console.log(
-      `Date range: ${startDate.toISOString()} to ${endDate.toISOString()}`
-    );
 
     // Filter expenses by date range
     const filtered = expenses.filter((expense) => {
@@ -207,16 +202,12 @@ const UtilityDistribution = () => {
       return expenseDate >= startDate && expenseDate <= endDate;
     });
 
-    console.log(
-      `Filtered ${filtered.length} out of ${expenses.length} expenses`
-    );
 
     // Sort expenses by date
     filtered.sort((a, b) => a.expenseDateObj - b.expenseDateObj);
 
     // Create an array of unique dates within the range
     const allDates = [...new Set(filtered.map((e) => e.expenseDate))].sort();
-    console.log("Unique dates for chart:", allDates);
 
     // Format dates for display
     const formattedDates = allDates.map(formatDateForDisplay);
@@ -254,13 +245,6 @@ const UtilityDistribution = () => {
         fill: chartType === "area",
         tension: 0.4,
       };
-    });
-
-    console.log(`Chart data for ${selectedType}:`, {
-      selectedType,
-      dateRange: `${startDate.toLocaleDateString()} - ${endDate.toLocaleDateString()}`,
-      dataPointCount: allDates.length,
-      datasetCount: datasets.length,
     });
 
     return { labels: formattedDates, datasets };

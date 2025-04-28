@@ -323,7 +323,8 @@ const Demo1LightSidebarContent = () => {
                       />
                     </div>
                     <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                      <FormattedMessage id="DASHBOARD.TOTAL_COST" />
+                        {/* <FormattedMessage id="DASHBOARD.TOTAL_COST" /> */}
+                        Total Cost
                     </h3>
                   </div>
                   <span className="text-sm text-purple-500 font-medium">

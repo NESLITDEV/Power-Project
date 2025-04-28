@@ -85,6 +85,7 @@ import UtilityManagement from "@/pages/utility/UtilityManagement";
 import { PaymentSuccess } from "../pages/account/billing/plans/blocks/PaymentSuccess";
 import { PaymentFailure } from "../pages/account/billing/plans/blocks/PaymentFailure";
 import AIAnalysisPage from "@/pages/dashboards/demo1/light-sidebar/AIAnalysisPage";
+import AddLocation from "@/pages/location/AddLocation";
 
 const AppRoutingSetup = () => {
   return (
@@ -345,6 +346,9 @@ const AppRoutingSetup = () => {
           />
           <Route path="/utility/my-expenses" element={<ExpenseTable />} />
           <Route path="/utility/ai-analysis" element={<AIAnalysisPage />} />
+
+          {/* Location Management Routes */}
+          <Route path="/property/add-property" element={<AddLocation />} />
         </Route>
       </Route>
       <Route path="error/*" element={<ErrorsRouting />} />

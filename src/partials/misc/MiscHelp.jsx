@@ -7,7 +7,7 @@ const MiscHelp = () => {
             <img src={toAbsoluteUrl('/media/illustrations/2.svg')} className="dark:hidden max-h-[150px]" alt="" />
             <img src={toAbsoluteUrl('/media/illustrations/2-dark.svg')} className="light:hidden max-h-[150px]" alt="" />
           </Fragment>} more={{
-      title: 'Go to Help Center',
+      // title: 'Go to Help Center',
       url: '#'
     }} />
 
@@ -15,7 +15,7 @@ const MiscHelp = () => {
             <img src={toAbsoluteUrl('/media/illustrations/4.svg')} className="dark:hidden max-h-[150px]" alt="" />
             <img src={toAbsoluteUrl('/media/illustrations/4-dark.svg')} className="light:hidden max-h-[150px]" alt="" />
           </Fragment>} more={{
-      title: 'Contact Support',
+      // title: 'Contact Support',
       url: 'https://devs.keenthemes.com/unresolved'
     }} />
     </div>;

@@ -50,7 +50,6 @@ const WaterUsage = ({ selectedFile, setSelectedFile }) => {
       return;
     }
     // Submit form data
-    console.log("Form submitted:", formData);
     toast.success("Reading saved successfully");
 
     // Reset form

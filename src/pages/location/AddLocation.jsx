@@ -36,6 +36,54 @@ import {
   SheetFooter,
 } from "@/components/ui/sheet";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .location-card {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .location-form {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .table-dark-header {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .table-dark-row-even {
+    background-color: #1F2129 !important;
+  }
+  
+  .dark .table-dark-row-odd {
+    background-color: #26272F !important;
+  }
+  
+  .dark .table-dark-cell {
+    border-color: #363843 !important;
+  }
+  
+  .dark .input-dark {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .text-dark-high {
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .text-dark-medium {
+    color: #B5B7C8 !important;
+  }
+  
+  .dark .text-dark-low {
+    color: #9A9CAE !important;
+  }
+`;
+
 const AddLocation = () => {
   const { auth } = useAuthContext();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -303,14 +351,15 @@ const AddLocation = () => {
   if (isLoading || isLoadingExpenseTypes || isLoadingExpenseData) {
     return (
       <div className="container mx-auto p-6">
-        <Card className="p-6">
+        <style>{darkModeStyles}</style>
+        <Card className="p-6 location-card">
           <div className="flex items-center justify-center h-32">
             <div className="flex flex-col items-center">
               <KeenIcon
                 icon="spinner"
                 className="animate-spin h-8 w-8 text-primary mb-4"
               />
-              <p className="text-gray-500 dark:text-gray-400">
+              <p className="text-gray-500 dark:text-gray-400 text-dark-medium">
                 {isLoading
                   ? "Loading addresses..."
                   : isLoadingExpenseTypes
@@ -326,20 +375,27 @@ const AddLocation = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <Card className="p-6 mb-6">
+      <style>{darkModeStyles}</style>
+      <Card className="p-6 mb-6 location-card">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 text-dark-high">
               <FormattedMessage
                 id="location.management.title"
                 defaultMessage="Property Management"
+                values={{
+                  de: "Immobilienverwaltung",
+                }}
               />
             </h2>
             {auth?.roles && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400 text-dark-medium">
                 <FormattedMessage
                   id="location.management.account"
                   defaultMessage="Account Type"
+                  values={{
+                    de: "Kontotyp",
+                  }}
                 />
                 : {auth.roles[0]}
               </p>
@@ -347,16 +403,19 @@ const AddLocation = () => {
           </div>
         </div>
       </Card>
-      <Card className="p-6 mb-6">
+      <Card className="p-6 mb-6 location-card">
         <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
           <div className="w-full md:w-1/3 space-y-2">
             <label
               htmlFor="address"
-              className="form-label text-gray-800 dark:text-gray-200 font-medium"
+              className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
             >
               <FormattedMessage
                 id="location.address.select"
                 defaultMessage="Select Address"
+                values={{
+                  de: "Adresse auswählen",
+                }}
               />
             </label>
             <Select
@@ -365,7 +424,7 @@ const AddLocation = () => {
             >
               <SelectTrigger
                 id="address"
-                className="bg-white dark:bg-gray-800 w-full"
+                className="bg-white dark:bg-gray-800 w-full input-dark"
               >
                 <SelectValue placeholder="Select an address" />
               </SelectTrigger>
@@ -380,7 +439,7 @@ const AddLocation = () => {
                     </SelectItem>
                   ))
                 ) : (
-                  <div className="px-4 py-2 text-sm text-gray-500">
+                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 text-dark-medium">
                     No addresses found.
                   </div>
                 )}
@@ -393,6 +452,9 @@ const AddLocation = () => {
                     <FormattedMessage
                       id="location.address.add"
                       defaultMessage="Add New Address"
+                      values={{
+                        de: "Neue Adresse hinzufügen",
+                      }}
                     />
                   </div>
                 </SelectItem>
@@ -403,11 +465,14 @@ const AddLocation = () => {
           <div className="w-full md:w-1/3 space-y-2">
             <label
               htmlFor="expenseType"
-              className="form-label text-gray-800 dark:text-gray-200 font-medium"
+              className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
             >
               <FormattedMessage
                 id="location.expenseType.select"
                 defaultMessage="Select Expense Type"
+                values={{
+                  de: "Ausgabentyp auswählen",
+                }}
               />
             </label>
             <Select
@@ -417,7 +482,7 @@ const AddLocation = () => {
             >
               <SelectTrigger
                 id="expenseType"
-                className="bg-white dark:bg-gray-800 w-full"
+                className="bg-white dark:bg-gray-800 w-full input-dark"
               >
                 <SelectValue placeholder="Select expense type" />
               </SelectTrigger>
@@ -432,7 +497,7 @@ const AddLocation = () => {
                     </SelectItem>
                   ))
                 ) : (
-                  <div className="px-4 py-2 text-sm text-gray-500">
+                  <div className="px-4 py-2 text-sm text-gray-500 dark:text-gray-400 text-dark-medium">
                     No expense types found.
                   </div>
                 )}
@@ -452,11 +517,17 @@ const AddLocation = () => {
                 <FormattedMessage
                   id="location.form.enabled"
                   defaultMessage="Ready to add location details"
+                  values={{
+                    de: "Bereit, Standortdetails hinzuzufügen",
+                  }}
                 />
               ) : (
                 <FormattedMessage
                   id="location.form.disabled.both"
                   defaultMessage="Select address & expense type"
+                  values={{
+                    de: "Adresse und Ausgabentyp auswählen",
+                  }}
                 />
               )}
             </div>
@@ -465,22 +536,28 @@ const AddLocation = () => {
       </Card>
       <div className="grid grid-cols-1 gap-6">
         <Card
-          className={`shadow-md border-gray-200 dark:border-gray-700 ${!isFormEnabled ? "opacity-60 pointer-events-none" : ""}`}
+          className={`shadow-md border-gray-200 dark:border-gray-700 location-form ${!isFormEnabled ? "opacity-60 pointer-events-none" : ""}`}
         >
           <CardHeader className="space-y-1 pb-6 border-b border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2">
               <KeenIcon icon="clipboard" className="w-6 h-6 text-primary" />
-              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100 text-dark-high">
                 <FormattedMessage
                   id="consumption.add.title"
                   defaultMessage="Record Consumption Data"
+                  values={{
+                    de: "Verbrauchsdaten erfassen",
+                  }}
                 />
               </CardTitle>
             </div>
-            <CardDescription className="text-gray-500 dark:text-gray-400">
+            <CardDescription className="text-gray-500 dark:text-gray-400 text-dark-medium">
               <FormattedMessage
                 id="consumption.add.description"
                 defaultMessage="Enter details for the selected address and expense type"
+                values={{
+                  de: "Geben Sie Details für die ausgewählte Adresse und den Ausgabentyp ein",
+                }}
               />
             </CardDescription>
           </CardHeader>
@@ -490,11 +567,14 @@ const AddLocation = () => {
                 <div className="space-y-2">
                   <label
                     htmlFor="ratePerUnit"
-                    className="form-label text-gray-800 dark:text-gray-200 font-medium"
+                    className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
                   >
                     <FormattedMessage
                       id="consumption.add.rateLabel"
                       defaultMessage="Rate Per Unit"
+                      values={{
+                        de: "Preis pro Einheit",
+                      }}
                     />
                   </label>
                   <Input
@@ -504,18 +584,21 @@ const AddLocation = () => {
                     value={formState.ratePerUnit}
                     onChange={handleInputChange}
                     placeholder="Enter rate"
-                    className="bg-white dark:bg-gray-800"
+                    className="bg-white dark:bg-gray-800 input-dark"
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <label
                     htmlFor="unitsConsumed"
-                    className="form-label text-gray-800 dark:text-gray-200 font-medium"
+                    className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
                   >
                     <FormattedMessage
                       id="consumption.add.unitsLabel"
                       defaultMessage="Units Consumed"
+                      values={{
+                        de: "Verbrauchte Einheiten",
+                      }}
                     />
                   </label>
                   <Input
@@ -525,18 +608,21 @@ const AddLocation = () => {
                     value={formState.unitsConsumed}
                     onChange={handleInputChange}
                     placeholder="Enter units"
-                    className="bg-white dark:bg-gray-800"
+                    className="bg-white dark:bg-gray-800 input-dark"
                     required
                   />
                 </div>
                 <div className="space-y-2">
                   <label
                     htmlFor="date"
-                    className="form-label text-gray-800 dark:text-gray-200 font-medium"
+                    className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
                   >
                     <FormattedMessage
                       id="consumption.add.dateLabel"
                       defaultMessage="Date"
+                      values={{
+                        de: "Datum",
+                      }}
                     />
                   </label>
                   <Input
@@ -544,7 +630,7 @@ const AddLocation = () => {
                     type="date"
                     value={formState.date}
                     onChange={handleInputChange}
-                    className="bg-white dark:bg-gray-800"
+                    className="bg-white dark:bg-gray-800 input-dark"
                     required
                   />
                 </div>
@@ -565,12 +651,18 @@ const AddLocation = () => {
                       <FormattedMessage
                         id="consumption.add.submittingButton"
                         defaultMessage="Saving..."
+                        values={{
+                          de: "Speichern...",
+                        }}
                       />
                     </>
                   ) : (
                     <FormattedMessage
                       id="consumption.add.submitButton"
                       defaultMessage="Save Data"
+                      values={{
+                        de: "Daten speichern",
+                      }}
                     />
                   )}
                 </Button>
@@ -582,10 +674,13 @@ const AddLocation = () => {
         <Sheet open={isAddAddressOpen} onOpenChange={setIsAddAddressOpen}>
           <SheetContent className="sm:max-w-md">
             <SheetHeader className="pb-6 border-b dark:border-gray-700">
-              <SheetTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <SheetTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100 text-dark-high">
                 <FormattedMessage
                   id="location.address.addNew"
                   defaultMessage="Add New Address"
+                  values={{
+                    de: "Neue Adresse hinzufügen",
+                  }}
                 />
               </SheetTitle>
             </SheetHeader>
@@ -594,11 +689,14 @@ const AddLocation = () => {
               <div className="space-y-2">
                 <label
                   htmlFor="newAddressName"
-                  className="form-label text-gray-800 dark:text-gray-200 font-medium"
+                  className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
                 >
                   <FormattedMessage
                     id="location.address.nameLabel"
                     defaultMessage="Address Name"
+                    values={{
+                      de: "Adressname",
+                    }}
                   />
                   <span className="text-red-500"> *</span>
                 </label>
@@ -607,7 +705,7 @@ const AddLocation = () => {
                   value={newAddressName}
                   onChange={(e) => setNewAddressName(e.target.value)}
                   placeholder="Enter address name"
-                  className="bg-white dark:bg-gray-800"
+                  className="bg-white dark:bg-gray-800 input-dark"
                   required
                 />
               </div>
@@ -615,11 +713,14 @@ const AddLocation = () => {
               <div className="space-y-2">
                 <label
                   htmlFor="newAddressComplete"
-                  className="form-label text-gray-800 dark:text-gray-200 font-medium"
+                  className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
                 >
                   <FormattedMessage
                     id="location.address.completeLabel"
                     defaultMessage="Complete Address"
+                    values={{
+                      de: "Vollständige Adresse",
+                    }}
                   />
                   <span className="text-red-500"> *</span>
                 </label>
@@ -628,7 +729,7 @@ const AddLocation = () => {
                   value={newAddressComplete}
                   onChange={(e) => setNewAddressComplete(e.target.value)}
                   placeholder="Enter complete address"
-                  className="bg-white dark:bg-gray-800"
+                  className="bg-white dark:bg-gray-800 input-dark"
                   required
                 />
               </div>
@@ -636,11 +737,14 @@ const AddLocation = () => {
               <div className="space-y-2">
                 <label
                   htmlFor="newAddressDescription"
-                  className="form-label text-gray-800 dark:text-gray-200 font-medium"
+                  className="form-label text-gray-800 dark:text-gray-200 font-medium text-dark-high"
                 >
                   <FormattedMessage
                     id="location.address.descriptionLabel"
                     defaultMessage="Description"
+                    values={{
+                      de: "Beschreibung",
+                    }}
                   />
                 </label>
                 <textarea
@@ -649,7 +753,7 @@ const AddLocation = () => {
                   onChange={(e) => setNewAddressDescription(e.target.value)}
                   rows={4}
                   placeholder="Enter address description (optional)"
-                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 p-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary"
+                  className="w-full rounded-md border border-gray-300 dark:border-gray-600 p-3 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:ring-2 focus:ring-primary input-dark"
                 />
               </div>
             </div>
@@ -665,6 +769,9 @@ const AddLocation = () => {
                   <FormattedMessage
                     id="location.address.cancel"
                     defaultMessage="Cancel"
+                    values={{
+                      de: "Abbrechen",
+                    }}
                   />
                 </Button>
                 <Button
@@ -682,12 +789,18 @@ const AddLocation = () => {
                       <FormattedMessage
                         id="location.address.saving"
                         defaultMessage="Saving..."
+                        values={{
+                          de: "Speichern...",
+                        }}
                       />
                     </>
                   ) : (
                     <FormattedMessage
                       id="location.address.save"
                       defaultMessage="Save Address"
+                      values={{
+                        de: "Adresse speichern",
+                      }}
                     />
                   )}
                 </Button>
@@ -698,13 +811,16 @@ const AddLocation = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="shadow-md">
-          <CardHeader className="pb-4 border-b border-gray-200 dark:border-gray-700">
+        <Card className="shadow-md location-card">
+          <CardHeader className="pb-4 border-b border-gray-200 dark:border-gray-700 table-dark-header">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              <CardTitle className="text-xl font-semibold text-gray-900 dark:text-gray-100 text-dark-high">
                 <FormattedMessage
                   id="location.list.title"
                   defaultMessage="Expense Overview"
+                  values={{
+                    de: "Ausgabenübersicht",
+                  }}
                 />
               </CardTitle>
               <div className="w-64">
@@ -712,7 +828,7 @@ const AddLocation = () => {
                   placeholder="Search expenses..."
                   value={expenseSearchQuery}
                   onChange={(e) => setExpenseSearchQuery(e.target.value)}
-                  className="bg-white dark:bg-gray-800"
+                  className="bg-white dark:bg-gray-800 input-dark"
                 />
               </div>
             </div>
@@ -720,17 +836,17 @@ const AddLocation = () => {
           <CardContent className="p-0">
             <div className="overflow-x-auto">
               <div className="min-w-full border-separate border-spacing-0">
-                <div className="grid grid-cols-4 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-200 dark:border-gray-700">
-                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300">
+                <div className="grid grid-cols-4 bg-gray-50 dark:bg-gray-800/70 border-b border-gray-200 dark:border-gray-700 table-dark-header">
+                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300 text-dark-high">
                     Address Name
                   </div>
-                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300 text-dark-high">
                     Expense Type
                   </div>
-                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300 text-center">
+                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300 text-center text-dark-high">
                     Total Cost
                   </div>
-                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300 text-end">
+                  <div className="py-5 px-6 text-sm font-medium text-gray-700 dark:text-gray-300 text-end text-dark-high">
                     Expense Date
                   </div>
                 </div>
@@ -742,7 +858,7 @@ const AddLocation = () => {
                         icon="spinner"
                         className="animate-spin h-8 w-8 text-primary mb-4"
                       />
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500 dark:text-gray-400 text-dark-medium">
                         Loading expense data...
                       </p>
                     </div>
@@ -756,7 +872,7 @@ const AddLocation = () => {
                         icon="document"
                         className="h-10 w-10 text-gray-300 dark:text-gray-600 mb-4"
                       />
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-gray-500 dark:text-gray-400 text-dark-medium">
                         {expenseSearchQuery
                           ? "No expenses match your search."
                           : "No expense data recorded yet."}
@@ -770,17 +886,21 @@ const AddLocation = () => {
                     <div
                       key={item.userAddressExpenseId}
                       className={`grid grid-cols-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors
-                    ${index % 2 === 0 ? "bg-white dark:bg-gray-900" : "bg-gray-50/50 dark:bg-gray-800/20"}`}
+                      ${
+                        index % 2 === 0
+                          ? "bg-white dark:bg-gray-900 table-dark-row-even"
+                          : "bg-gray-50/50 dark:bg-gray-800/20 table-dark-row-odd"
+                      }`}
                     >
-                      <div className="py-4 px-6 text-sm text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-800 flex items-center">
+                      <div className="py-4 px-6 text-sm text-gray-700 dark:text-gray-300 font-medium border-b border-gray-100 dark:border-gray-800 flex items-center table-dark-cell text-dark-high">
                         {item.addressName || "N/A"}
                       </div>
-                      <div className="py-4 px-6 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 flex items-center">
+                      <div className="py-4 px-6 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 flex items-center table-dark-cell text-dark-medium">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
                           {item.expenseTypeName || "N/A"}
                         </span>
                       </div>
-                      <div className="py-4 px-6 text-sm text-gray-700 dark:text-gray-300 font-medium text-end border-b border-gray-100 dark:border-gray-800 flex items-center justify-center">
+                      <div className="py-4 px-6 text-sm text-gray-700 dark:text-gray-300 font-medium text-end border-b border-gray-100 dark:border-gray-800 flex items-center justify-center table-dark-cell text-dark-high">
                         {item.totalCost != null ? (
                           <span className="text-emerald-600 dark:text-emerald-400 font-medium">
                             ${item.totalCost.toFixed(2)}
@@ -789,7 +909,7 @@ const AddLocation = () => {
                           "N/A"
                         )}
                       </div>
-                      <div className="py-4 px-6 text-sm text-end text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 flex items-center justify-end">
+                      <div className="py-4 px-6 text-sm text-end text-gray-600 dark:text-gray-400 border-b border-gray-100 dark:border-gray-800 flex items-center justify-end table-dark-cell text-dark-medium">
                         {item.expenseForDate ? (
                           <span className="whitespace-nowrap">
                             {new Date(item.expenseForDate).toLocaleDateString(

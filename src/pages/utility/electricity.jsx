@@ -7,6 +7,32 @@ import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { FormattedMessage, useIntl } from "react-intl";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .electricity-card {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .electricity-text-high {
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .electricity-text-medium {
+    color: #B5B7C8 !important;
+  }
+  
+  .dark .electricity-input {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .electricity-button {
+    border-color: #363843 !important;
+  }
+`;
+
 const ElectricityUsage = ({
   selectedFile,
   setSelectedFile,
@@ -139,13 +165,14 @@ const ElectricityUsage = ({
 
   return (
     <div className="container mx-auto p-6">
+      <style>{darkModeStyles}</style>
       {/* Form and Image Preview Section */}
       <div
         className={`grid gap-6 ${selectedFile?.url ? "lg:grid-cols-2" : "grid-cols-1"}`}
       >
         {/* Manual Entry Section */}
-        <Card className="p-6">
-          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6">
+        <Card className="p-6 electricity-card">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 electricity-text-high">
             <FormattedMessage
               id="UTILITY.ELECTRICITY.USAGE"
               values={{ type: expenseTypeName || "Utility" }}
@@ -154,7 +181,7 @@ const ElectricityUsage = ({
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 electricity-text-medium">
                   <FormattedMessage id="UTILITY.ELECTRICITY.RATE_PER_UNIT" />
                 </label>
                 <Input
@@ -165,14 +192,14 @@ const ElectricityUsage = ({
                   placeholder={intl.formatMessage({
                     id: "UTILITY.ELECTRICITY.PLACEHOLDER.RATE",
                   })}
-                  className="w-full"
+                  className="w-full electricity-input"
                   required
                   disabled={disabled}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 electricity-text-medium">
                   <FormattedMessage id="UTILITY.ELECTRICITY.UNITS_CONSUMED" />
                 </label>
                 <Input
@@ -183,14 +210,14 @@ const ElectricityUsage = ({
                   placeholder={intl.formatMessage({
                     id: "UTILITY.ELECTRICITY.PLACEHOLDER.UNITS",
                   })}
-                  className="w-full"
+                  className="w-full electricity-input"
                   required
                   disabled={disabled}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 electricity-text-medium">
                   <FormattedMessage id="UTILITY.ELECTRICITY.DATE" />
                 </label>
                 <Input
@@ -198,14 +225,14 @@ const ElectricityUsage = ({
                   name="date"
                   value={formData.date}
                   onChange={handleInputChange}
-                  className="w-full"
+                  className="w-full electricity-input"
                   required
                   disabled={disabled}
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 electricity-text-medium">
                   <FormattedMessage id="UTILITY.ELECTRICITY.NOTES" />
                 </label>
                 <Input
@@ -216,7 +243,7 @@ const ElectricityUsage = ({
                   placeholder={intl.formatMessage({
                     id: "UTILITY.ELECTRICITY.PLACEHOLDER.NOTES",
                   })}
-                  className="w-full"
+                  className="w-full electricity-input"
                   disabled={disabled}
                 />
               </div>
@@ -235,6 +262,7 @@ const ElectricityUsage = ({
                   })
                 }
                 disabled={disabled}
+                className="electricity-button"
               >
                 <FormattedMessage id="UTILITY.ELECTRICITY.CLEAR" />
               </Button>
@@ -247,18 +275,17 @@ const ElectricityUsage = ({
 
         {/* Image Preview Section */}
         {selectedFile?.url && (
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold mb-4">
-              <FormattedMessage
-                id="UTILITY.ELECTRICITY.BILL_PREVIEW"
-                values={{ name: selectedFile.name }}
-              />
-            </h3>
-            <div className="aspect-video relative rounded-lg overflow-hidden">
+          <Card className="p-6 electricity-card">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 electricity-text-high">
+              <FormattedMessage id="UTILITY.ELECTRICITY.PREVIEW" />
+            </h2>
+            <div className="flex justify-center items-center border rounded-md p-2 dark:border-gray-700">
               <img
                 src={selectedFile.url}
-                alt="Bill preview"
-                className="object-contain w-full h-full"
+                alt={intl.formatMessage({
+                  id: "UTILITY.ELECTRICITY.ALT.BILL_PREVIEW",
+                })}
+                className="max-h-[500px] object-contain"
               />
             </div>
           </Card>

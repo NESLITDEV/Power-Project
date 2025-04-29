@@ -22,6 +22,54 @@ import axios from "axios";
 import { useAuthContext } from "@/auth";
 import { FormattedMessage } from "react-intl";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .expense-card {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .expense-table-header {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .expense-table-row-even {
+    background-color: #1F2129 !important;
+  }
+  
+  .dark .expense-table-row-odd {
+    background-color: #26272F !important;
+  }
+  
+  .dark .expense-table-cell {
+    border-color: #363843 !important;
+  }
+  
+  .dark .expense-input {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .expense-text-high {
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .expense-text-medium {
+    color: #B5B7C8 !important;
+  }
+  
+  .dark .expense-button {
+    border-color: #363843 !important;
+  }
+  
+  .dark .expense-pagination {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+  }
+`;
+
 const ITEMS_PER_PAGE = 10;
 
 const ExpenseTable = () => {
@@ -144,10 +192,17 @@ const ExpenseTable = () => {
 
   if (loading) {
     return (
-      <Card className="p-6">
+      <Card className="p-6 expense-card">
+        <style>{darkModeStyles}</style>
         <div className="flex items-center justify-center h-32">
-          <div className="text-gray-500 dark:text-gray-400">
-            Loading expenses...
+          <div className="flex flex-col items-center">
+            <KeenIcon
+              icon="spinner"
+              className="animate-spin h-8 w-8 text-primary mb-4"
+            />
+            <div className="text-gray-500 dark:text-gray-400 expense-text-medium">
+              Loading expenses...
+            </div>
           </div>
         </div>
       </Card>
@@ -155,14 +210,15 @@ const ExpenseTable = () => {
   }
 
   return (
-    <Card className="p-6">
+    <Card className="p-6 expense-card">
+      <style>{darkModeStyles}</style>
       <div className="flex flex-col gap-4 mb-6">
         <div className="flex justify-between items-center">
           <div className="space-y-1">
-            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+            <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 expense-text-high">
               My Expenses
             </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
+            <p className="text-sm text-gray-500 dark:text-gray-400 expense-text-medium">
               Showing {startIndex + 1} to{" "}
               {Math.min(endIndex, filteredExpenses.length)} of{" "}
               {filteredExpenses.length} entries
@@ -170,7 +226,7 @@ const ExpenseTable = () => {
           </div>
           <div className="flex items-center gap-4">
             <Select value={selectedType} onValueChange={setSelectedType}>
-              <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800">
+              <SelectTrigger className="w-[180px] bg-white dark:bg-gray-800 expense-input">
                 <SelectValue placeholder="Filter by type" />
               </SelectTrigger>
               <SelectContent>
@@ -192,7 +248,7 @@ const ExpenseTable = () => {
               placeholder="Search expenses..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full"
+              className="w-full expense-input"
             />
           </div>
           <div className="flex gap-4">
@@ -201,19 +257,19 @@ const ExpenseTable = () => {
               name="startDate"
               value={dateRange.startDate}
               onChange={handleDateRangeChange}
-              className="w-[150px]"
+              className="w-[150px] expense-input"
             />
             <Input
               type="date"
               name="endDate"
               value={dateRange.endDate}
               onChange={handleDateRangeChange}
-              className="w-[150px]"
+              className="w-[150px] expense-input"
             />
             <Button
               variant="outline"
               onClick={clearFilters}
-              className="whitespace-nowrap"
+              className="whitespace-nowrap expense-button"
             >
               Clear Filters
             </Button>
@@ -221,21 +277,21 @@ const ExpenseTable = () => {
         </div>
       </div>
 
-      <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <div className="rounded-lg border border-gray-200 dark:border-gray-700 expense-table-container overflow-hidden">
         <Table>
-          <TableHeader className="bg-gray-50 dark:bg-gray-800/50">
+          <TableHeader className="bg-gray-50 dark:bg-gray-800/50 expense-table-header">
             <TableRow className="hover:bg-transparent">
-              <TableHead className="py-4 px-6 text-gray-600 dark:text-gray-300 font-medium">
+              <TableHead className="py-4 px-6 text-gray-600 dark:text-gray-300 font-medium expense-text-high">
                 Date
               </TableHead>
-              <TableHead className="py-4 px-6 text-gray-600 dark:text-gray-300 font-medium">
+              <TableHead className="py-4 px-6 text-gray-600 dark:text-gray-300 font-medium expense-text-high">
                 Type
               </TableHead>
               <TableHead className="py-4 px-6">
                 <Button
                   variant="ghost"
                   onClick={() => handleSort("quantity")}
-                  className="text-gray-600 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2"
+                  className="text-gray-600 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2 expense-text-high"
                 >
                   Quantity
                   {sortConfig.key === "quantity" && (
@@ -254,7 +310,7 @@ const ExpenseTable = () => {
                 <Button
                   variant="ghost"
                   onClick={() => handleSort("totalCost")}
-                  className="text-gray-600 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2"
+                  className="text-gray-600 dark:text-gray-300 font-medium hover:text-gray-900 dark:hover:text-gray-100 flex items-center gap-2 expense-text-high"
                 >
                   Total Cost
                   {sortConfig.key === "totalCost" && (
@@ -272,25 +328,32 @@ const ExpenseTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {currentExpenses.map((expense) => (
+            {currentExpenses.map((expense, index) => (
               <TableRow
                 key={expense.expenseId}
-                className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                className={`hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
+                  index % 2 === 0
+                    ? "bg-white dark:bg-gray-900 expense-table-row-even"
+                    : "bg-gray-50/50 dark:bg-gray-800/20 expense-table-row-odd"
+                }`}
               >
-                <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300">
-                  {new Date(expense.expenseForDate).toLocaleDateString(undefined, {
-                    year: "numeric",
-                    month: "2-digit",
-                    day: "2-digit",
-                  })}
+                <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300 expense-text-medium expense-table-cell">
+                  {new Date(expense.expenseForDate).toLocaleDateString(
+                    undefined,
+                    {
+                      year: "numeric",
+                      month: "2-digit",
+                      day: "2-digit",
+                    }
+                  )}
                 </TableCell>
-                <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300">
+                <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300 expense-text-medium expense-table-cell">
                   {expense.expenseTypeName}
                 </TableCell>
-                <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300">
+                <TableCell className="py-4 px-6 text-gray-600 dark:text-gray-300 expense-text-medium expense-table-cell">
                   {expense.quantity}
                 </TableCell>
-                <TableCell className="py-4 px-6 font-medium text-gray-900 dark:text-gray-100">
+                <TableCell className="py-4 px-6 font-medium text-gray-900 dark:text-gray-100 expense-text-high expense-table-cell">
                   ${expense.totalCost.toLocaleString()}
                 </TableCell>
               </TableRow>
@@ -299,7 +362,7 @@ const ExpenseTable = () => {
               <TableRow>
                 <TableCell
                   colSpan={4}
-                  className="py-8 text-center text-gray-500 dark:text-gray-400"
+                  className="py-8 text-center text-gray-500 dark:text-gray-400 expense-text-medium expense-table-cell"
                 >
                   No expenses found
                 </TableCell>
@@ -318,7 +381,7 @@ const ExpenseTable = () => {
               size="sm"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1}
-              className="px-4"
+              className="px-4 expense-button"
             >
               Previous
             </Button>
@@ -328,7 +391,7 @@ const ExpenseTable = () => {
                 variant={currentPage === page ? "default" : "outline"}
                 size="sm"
                 onClick={() => handlePageChange(page)}
-                className="px-4"
+                className={`px-4 ${currentPage !== page ? "expense-button" : ""}`}
               >
                 {page}
               </Button>
@@ -338,7 +401,7 @@ const ExpenseTable = () => {
               size="sm"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className="px-4"
+              className="px-4 expense-button"
             >
               Next
             </Button>

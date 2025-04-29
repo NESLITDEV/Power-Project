@@ -9,6 +9,20 @@ import {
 import { Pie } from "react-chartjs-2";
 import { format } from "date-fns";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .pie-input {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .pie-content {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+`;
+
 const generateColors = (index) => {
   const palettes = [
     { main: "rgb(45, 94, 255)", light: "rgba(45, 94, 255, 0.7)" },
@@ -118,29 +132,40 @@ const UtilityPieChart = ({ expenses }) => {
 
   // Check if there's no data
   const data = getFilteredData();
-  if (data.labels.length === 0) {
-    return <div>No data found</div>;
-  }
+  const hasNoData = data.labels.length === 0;
+
+  // Always render the dropdown and time selector
+  const timeRangeSelector = (
+    <div className="flex justify-end mb-2">
+      <Select value={pieTimeRange} onValueChange={setPieTimeRange}>
+        <SelectTrigger className="w-36 h-9 text-sm pie-input">
+          <SelectValue placeholder="Time Range" />
+        </SelectTrigger>
+        <SelectContent className="pie-content">
+          <SelectItem value="day">Daily</SelectItem>
+          <SelectItem value="7days">Last 7 Days</SelectItem>
+          <SelectItem value="month">Monthly</SelectItem>
+          <SelectItem value="6months">Last 6 Months</SelectItem>
+          <SelectItem value="year">Yearly</SelectItem>
+        </SelectContent>
+      </Select>
+    </div>
+  );
 
   return (
     <div className="w-full">
-      <div className="flex justify-end mb-2">
-        <Select value={pieTimeRange} onValueChange={setPieTimeRange}>
-          <SelectTrigger className="w-36 h-9 text-sm">
-            <SelectValue placeholder="Time Range" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="day">Daily</SelectItem>
-            <SelectItem value="7days">Last 7 Days</SelectItem>
-            <SelectItem value="month">Monthly</SelectItem>
-            <SelectItem value="6months">Last 6 Months</SelectItem>
-            <SelectItem value="year">Yearly</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="h-[240px] sm:h-[260px] flex items-center justify-center">
-        <Pie data={data} options={pieOptions} />
-      </div>
+      <style>{darkModeStyles}</style>
+      {timeRangeSelector}
+
+      {hasNoData ? (
+        <div className="h-[215px] sm:h-[230px] flex items-center justify-center text-gray-500 dark:text-gray-400">
+          No data found for the selected time range
+        </div>
+      ) : (
+        <div className="h-[215px] sm:h-[230px] flex items-center justify-center">
+          <Pie data={data} options={pieOptions} />
+        </div>
+      )}
     </div>
   );
 };

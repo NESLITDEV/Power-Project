@@ -6,6 +6,35 @@ import { useAuthContext } from "@/auth";
 import { FormattedMessage } from "react-intl";
 import UtilityPieChart from "./blocks/UtilityPieChart";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .dashboard-card {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .dashboard-text-high {
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .dashboard-text-medium {
+    color: #B5B7C8 !important;
+  }
+  
+  .dark .dashboard-highlight {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .dashboard-button {
+    border-color: #363843 !important;
+  }
+  
+  .dark .dashboard-border {
+    border-color: #363843 !important;
+  }
+`;
+
 const Demo1LightSidebarContent = () => {
   const [expenses, setExpenses] = useState([]);
   const [expenseTypes, setExpenseTypes] = useState([]);
@@ -280,6 +309,7 @@ const Demo1LightSidebarContent = () => {
 
   return (
     <div className="space-y-6">
+      <style>{darkModeStyles}</style>
       {/* Channel Stats Section with Carousel */}
       <div className="relative">
         {loading ? (
@@ -287,7 +317,7 @@ const Demo1LightSidebarContent = () => {
             {[1, 2, 3].map((index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 animate-pulse"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 animate-pulse dashboard-card"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-3">
@@ -307,13 +337,13 @@ const Demo1LightSidebarContent = () => {
           <>
             {/* 🧮 Fixed: Total + Pie Chart */}
             <div className="grid grid-cols-1 lg:grid-cols-10 gap-4 items-start">
-              <div className="col-span-1 lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4">
+              <div className="col-span-1 lg:col-span-3 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-4 dashboard-card">
                 <div className="h-[280px] w-full">
                   <UtilityPieChart expenses={expenses} />
                 </div>
               </div>
               {/* 🧮 Total Cost */}
-              <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 flex flex-col justify-between min-h-[280px] border-2 border-purple-300 dark:border-purple-800">
+              <div className="col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 flex flex-col justify-between min-h-[280px] border-2 border-purple-300 dark:border-purple-800 dashboard-card">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center space-x-3">
                     <div className="w-12 h-12 flex items-center justify-center bg-purple-100 dark:bg-purple-900/20 rounded-lg">
@@ -322,27 +352,29 @@ const Demo1LightSidebarContent = () => {
                         className="text-purple-600 dark:text-purple-400"
                       />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                        {/* <FormattedMessage id="DASHBOARD.TOTAL_COST" /> */}
-                        Total Cost
+                    <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200 dashboard-text-high">
+                      {/* <FormattedMessage id="DASHBOARD.TOTAL_COST" /> */}
+                      Total Cost
                     </h3>
                   </div>
                   <span className="text-sm text-purple-500 font-medium">
                     <FormattedMessage id="DASHBOARD.ALL_TYPES" />
                   </span>
                 </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+                <div className="text-2xl font-bold text-gray-900 dark:text-gray-100 dashboard-text-high">
                   ${totalCost.toLocaleString()}
                 </div>
-                <div className="bg-purple-50 dark:bg-purple-900/10 rounded-md p-2 mt-3 mb-2">
+                <div className="bg-purple-50 dark:bg-purple-900/10 rounded-md p-2 mt-3 mb-2 dashboard-highlight">
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
                       Total Expenses:
                     </span>
-                    <span className="text-sm font-bold">{expenses.length}</span>
+                    <span className="text-sm font-bold dashboard-text-high">
+                      {expenses.length}
+                    </span>
                   </div>
                 </div>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2 dashboard-text-medium">
                   Last Update:{" "}
                   {expenses.length > 0
                     ? new Date(
@@ -364,7 +396,7 @@ const Demo1LightSidebarContent = () => {
                   return (
                     <div
                       key={expenseType}
-                      className={`col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 transition-all duration-200 hover:shadow-md min-h-[280px] flex flex-col justify-between border-2 ${colorClasses.accent}`}
+                      className={`col-span-1 lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-sm p-5 transition-all duration-200 hover:shadow-md min-h-[280px] flex flex-col justify-between border-2 ${colorClasses.accent} dashboard-card`}
                     >
                       <div>
                         <div className="flex items-center justify-between mb-2">
@@ -377,7 +409,7 @@ const Demo1LightSidebarContent = () => {
                                 className={colorClasses.text}
                               />
                             </div>
-                            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200">
+                            <h3 className="text-base font-semibold text-gray-800 dark:text-gray-200 dashboard-text-high">
                               {expenseType}
                             </h3>
                           </div>
@@ -394,16 +426,16 @@ const Demo1LightSidebarContent = () => {
                             )}%
                           </span>
                         </div>
-                        <div className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3">
+                        <div className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-3 dashboard-text-high">
                           {detailedStats.quantity.toLocaleString()}{" "}
                           {getUnit(expenseType)}
                         </div>
 
                         <div
-                          className={`text-xs rounded-md p-2 mb-3 ${colorClasses.highlight} flex items-center justify-between`}
+                          className={`text-xs rounded-md p-2 mb-3 ${colorClasses.highlight} flex items-center justify-between dashboard-highlight`}
                         >
                           <span className="font-medium">Total Cost:</span>
-                          <span className="font-bold">
+                          <span className="font-bold dashboard-text-high">
                             $
                             {detailedStats.totalCost.toLocaleString(undefined, {
                               maximumFractionDigits: 2,
@@ -413,7 +445,9 @@ const Demo1LightSidebarContent = () => {
 
                         <div className="space-y-2 text-xs">
                           <div className="flex justify-between">
-                            <span className="text-gray-500">Avg. Cost:</span>
+                            <span className="text-gray-500 dark:text-gray-400 dashboard-text-medium">
+                              Avg. Cost:
+                            </span>
                             <span
                               className={`font-medium ${colorClasses.light}`}
                             >
@@ -425,17 +459,21 @@ const Demo1LightSidebarContent = () => {
                             </span>
                           </div>
                           <div className="flex justify-between">
-                            <span className="text-gray-500">Last Reading:</span>
-                            <span className="font-medium">
+                            <span className="text-gray-500 dark:text-gray-400 dashboard-text-medium">
+                              Last Reading:
+                            </span>
+                            <span className="font-medium dashboard-text-high">
                               {detailedStats.lastReading}
                             </span>
                           </div>
                         </div>
                       </div>
                       <div>
-                        <div className="border-t border-gray-100 dark:border-gray-700 pt-2 mt-2 flex justify-between text-xs">
-                          <span className="text-gray-500">Last Update:</span>
-                          <span className="text-gray-600 dark:text-gray-400">
+                        <div className="border-t border-gray-100 dark:border-gray-700 pt-2 mt-2 flex justify-between text-xs dashboard-border">
+                          <span className="text-gray-500 dark:text-gray-400 dashboard-text-medium">
+                            Last Update:
+                          </span>
+                          <span className="text-gray-600 dark:text-gray-400 dashboard-text-medium">
                             {detailedStats.lastUpdate}
                           </span>
                         </div>
@@ -450,7 +488,7 @@ const Demo1LightSidebarContent = () => {
               <div className="flex justify-between mt-4">
                 <button
                   onClick={prevSlide}
-                  className="btn btn-icon btn-light btn-sm"
+                  className="btn btn-icon btn-light btn-sm dashboard-button"
                 >
                   <KeenIcon icon="arrow-left" />
                 </button>
@@ -474,7 +512,7 @@ const Demo1LightSidebarContent = () => {
                 </div>
                 <button
                   onClick={nextSlide}
-                  className="btn btn-icon btn-light btn-sm"
+                  className="btn btn-icon btn-light btn-sm dashboard-button"
                 >
                   <KeenIcon icon="arrow-right" />
                 </button>

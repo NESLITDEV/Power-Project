@@ -28,6 +28,37 @@ import { KeenIcon } from "@/components/keenicons";
 import { toast } from "sonner";
 import { FormattedMessage } from "react-intl";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .utility-card {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .utility-text-high {
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .utility-text-medium {
+    color: #B5B7C8 !important;
+  }
+  
+  .dark .utility-input {
+    background-color: #26272F !important;
+    border-color: #363843 !important;
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .utility-button {
+    border-color: #363843 !important;
+  }
+  
+  .dark .utility-sheet {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+`;
+
 const UtilityManagement = () => {
   const [selectedUtility, setSelectedUtility] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
@@ -156,8 +187,9 @@ const UtilityManagement = () => {
   if (loading) {
     return (
       <div className="container mx-auto p-6">
-        <Card className="p-6">
-          <div className="text-center">
+        <style>{darkModeStyles}</style>
+        <Card className="p-6 utility-card">
+          <div className="text-center utility-text-medium">
             <FormattedMessage id="UTILITY.MANAGEMENT.LOADING" />
           </div>
         </Card>
@@ -167,15 +199,16 @@ const UtilityManagement = () => {
 
   return (
     <div className="container mx-auto p-6">
+      <style>{darkModeStyles}</style>
       {/* Utility Selection Dropdown */}
-      <Card className="p-6 mb-6">
+      <Card className="p-6 mb-6 utility-card">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-1">
-            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200">
+            <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 utility-text-high">
               <FormattedMessage id="UTILITY.MANAGEMENT.ADD_EXPENSE" />
             </h2>
             {userRole && (
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-gray-500 dark:text-gray-400 utility-text-medium">
                 <FormattedMessage id="UTILITY.MANAGEMENT.ACCOUNT_TYPE" />:{" "}
                 {userRole}
               </p>
@@ -183,14 +216,14 @@ const UtilityManagement = () => {
           </div>
           <div className="flex items-center gap-4">
             <Select value={selectedUtility} onValueChange={handleUtilityChange}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[200px] utility-input">
                 <SelectValue
                   placeholder={
                     <FormattedMessage id="UTILITY.MANAGEMENT.SELECT_UTILITY" />
                   }
                 />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="utility-card">
                 {expenseTypes.map((type) => (
                   <SelectItem
                     key={type.expenseTypeId}
@@ -245,29 +278,31 @@ const UtilityManagement = () => {
 
       {/* Add Expense Type Sheet */}
       <Sheet open={isAddExpenseTypeOpen} onOpenChange={setIsAddExpenseTypeOpen}>
-        <SheetContent>
+        <SheetContent className="utility-sheet">
           <SheetHeader>
-            <SheetTitle>
+            <SheetTitle className="utility-text-high">
               <FormattedMessage id="UTILITY.MANAGEMENT.ADD_NEW_EXPENSE_TYPE" />
             </SheetTitle>
           </SheetHeader>
           <div className="py-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                <label className="text-sm font-medium text-gray-700 dark:text-gray-300 utility-text-medium">
                   <FormattedMessage id="UTILITY.MANAGEMENT.ENTER_EXPENSE_TYPE" />
                 </label>
                 <Input
                   value={newExpenseType}
                   onChange={(e) => setNewExpenseType(e.target.value)}
-                  placeholder="Enter Expense Name"
-                  className="w-full"
+                  placeholder={
+                    <FormattedMessage id="UTILITY.MANAGEMENT.ENTER_EXPENSE_NAME" />
+                  }
+                  className="w-full utility-input"
                 />
               </div>
             </div>
           </div>
           <SheetFooter>
-            <Button onClick={handleAddExpenseType}>
+            <Button onClick={handleAddExpenseType} className="utility-button">
               <FormattedMessage id="UTILITY.MANAGEMENT.SAVE" />
             </Button>
           </SheetFooter>

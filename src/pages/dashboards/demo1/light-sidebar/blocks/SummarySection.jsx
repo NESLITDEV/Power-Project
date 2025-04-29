@@ -1,6 +1,26 @@
 import React from "react";
 import { FormattedMessage } from "react-intl";
 
+// Custom CSS for dark mode
+const darkModeStyles = `
+  .dark .summary-card {
+    background-color: #1F2129 !important;
+    border-color: #363843 !important;
+  }
+  
+  .dark .summary-text-high {
+    color: #F5F5F5 !important;
+  }
+  
+  .dark .summary-text-medium {
+    color: #B5B7C8 !important;
+  }
+  
+  .dark .summary-border {
+    border-color: #363843 !important;
+  }
+`;
+
 const SummarySection = ({
   loading,
   expenseTypes,
@@ -11,10 +31,11 @@ const SummarySection = ({
   if (loading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <style>{darkModeStyles}</style>
         {[1, 2, 3].map((index) => (
           <div
             key={index}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 animate-pulse"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 animate-pulse summary-card"
           >
             <div className="h-6 w-32 bg-gray-200 dark:bg-gray-700 rounded mb-4" />
             <div className="space-y-3">
@@ -24,7 +45,7 @@ const SummarySection = ({
                   <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
                 </div>
               ))}
-              <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700">
+              <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700 summary-border">
                 <div className="flex justify-between items-center">
                   <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded" />
                   <div className="h-5 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
@@ -39,35 +60,36 @@ const SummarySection = ({
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <style>{darkModeStyles}</style>
       {expenseTypes.map((expenseType) => {
         const stats = getDetailedStats(expenseType);
         return (
           <div
             key={expenseType}
-            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200"
+            className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200 summary-card"
           >
-            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">
+            <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 summary-text-high">
               {expenseType} <FormattedMessage id="DASHBOARD.SUMMARY" />
             </h3>
             <div className="space-y-3">
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
                   <FormattedMessage id="DASHBOARD.CURRENT_USAGE" />
                 </span>
-                <span className="font-medium">
+                <span className="font-medium summary-text-high">
                   {stats.currentUsage.toLocaleString()} {stats.unit}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
                   <FormattedMessage id="DASHBOARD.AVERAGE" />
                 </span>
-                <span className="font-medium">
+                <span className="font-medium summary-text-high">
                   {stats.average.toFixed(2)} {stats.unit}
                 </span>
               </div>
               <div className="flex justify-between items-center">
-                <span className="text-gray-500 dark:text-gray-400">
+                <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
                   <FormattedMessage id="DASHBOARD.CHANGE" />
                 </span>
                 <span
@@ -79,9 +101,9 @@ const SummarySection = ({
                   {stats.change.toFixed(1)}%
                 </span>
               </div>
-              <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700">
+              <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700 summary-border">
                 <div className="flex justify-between items-center">
-                  <span className="text-gray-500 dark:text-gray-400">
+                  <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
                     <FormattedMessage id="DASHBOARD.STATUS" />
                   </span>
                   <span
@@ -105,35 +127,41 @@ const SummarySection = ({
       })}
 
       {/* Total Summary Card */}
-      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200">
-        <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow duration-200 summary-card">
+        <h3 className="text-lg font-medium text-gray-800 dark:text-gray-200 mb-4 summary-text-high">
           <FormattedMessage id="DASHBOARD.OVERALL_SUMMARY" />
         </h3>
         <div className="space-y-3">
           <div className="flex justify-between items-center">
-            <span className="text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
               <FormattedMessage id="DASHBOARD.TOTAL_COST" />
             </span>
-            <span className="font-medium">${totalCost.toLocaleString()}</span>
+            <span className="font-medium summary-text-high">
+              ${totalCost.toLocaleString()}
+            </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
               <FormattedMessage id="DASHBOARD.ACTIVE_TYPES" />
             </span>
-            <span className="font-medium">{expenseTypes.length}</span>
+            <span className="font-medium summary-text-high">
+              {expenseTypes.length}
+            </span>
           </div>
           <div className="flex justify-between items-center">
-            <span className="text-gray-500 dark:text-gray-400">
+            <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
               <FormattedMessage id="DASHBOARD.TOTAL_RECORDS" />
             </span>
-            <span className="font-medium">{expenses.length}</span>
+            <span className="font-medium summary-text-high">
+              {expenses.length}
+            </span>
           </div>
-          <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700">
+          <div className="pt-2 mt-2 border-t border-gray-100 dark:border-gray-700 summary-border">
             <div className="flex justify-between items-center">
-              <span className="text-gray-500 dark:text-gray-400">
+              <span className="text-gray-500 dark:text-gray-400 summary-text-medium">
                 <FormattedMessage id="DASHBOARD.LAST_UPDATED" />
               </span>
-              <span className="text-sm text-gray-600 dark:text-gray-300">
+              <span className="text-sm text-gray-600 dark:text-gray-300 summary-text-high">
                 {expenses.length > 0 ? (
                   new Date(
                     Math.max(...expenses.map((e) => new Date(e.createdDate)))

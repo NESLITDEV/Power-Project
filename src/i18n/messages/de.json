@@ -239,5 +239,28 @@
     "PAYMENT_SUCCESS_MESSAGE": "Ihr Abonnement wurde erfolgreich verarbeitet. Sie können jetzt alle Funktionen Ihres neuen Plans nutzen.",
     "RETURN_TO_BILLING": "Zurück zur Abrechnung",
     "TRY_AGAIN": "Erneut versuchen"
-  }
+  },
+
+  "location.management.title": "Immobilienverwaltung",
+  "location.management.account": "Kontotyp",
+  "location.address.select": "Adresse auswählen",
+  "location.address.add": "Neue Adresse hinzufügen",
+  "location.expenseType.select": "Ausgabentyp auswählen",
+  "location.form.enabled": "Bereit, Standortdetails hinzuzufügen",
+  "location.form.disabled.both": "Adresse und Ausgabentyp auswählen",
+  "consumption.add.title": "Verbrauchsdaten erfassen",
+  "consumption.add.description": "Geben Sie Details für die ausgewählte Adresse und den Ausgabentyp ein",
+  "consumption.add.rateLabel": "Preis pro Einheit",
+  "consumption.add.unitsLabel": "Verbrauchte Einheiten",
+  "consumption.add.dateLabel": "Datum",
+  "consumption.add.submittingButton": "Speichern...",
+  "consumption.add.submitButton": "Daten speichern",
+  "location.address.addNew": "Neue Adresse hinzufügen",
+  "location.address.nameLabel": "Adressname",
+  "location.address.completeLabel": "Vollständige Adresse",
+  "location.address.descriptionLabel": "Beschreibung",
+  "location.address.cancel": "Abbrechen",
+  "location.address.saving": "Speichern...",
+  "location.address.save": "Adresse speichern",
+  "location.list.title": "Ausgabenübersicht"
 }

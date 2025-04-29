@@ -284,14 +284,17 @@ const UtilityDistribution = () => {
         .map((e) => e.expenseDate)
     ).size;
 
-    // For 6 months and year views, ensure minimum width regardless of data point count
+    // For all time ranges, ensure minimum width regardless of data point count
     if (timeRange === "6months" || timeRange === "year") {
       // Use a fixed width for longer time periods to ensure proper display
+      return Math.max(1200, dateCount * 45);
+    } else if (timeRange === "month") {
+      // For 30 days view, ensure a minimum width similar to other views
       return Math.max(1200, dateCount * 45);
     }
 
     // For shorter time ranges, use the data point based calculation
-    return Math.max(600, dateCount * 45);
+    return Math.max(1200, dateCount * 45);
   };
 
   const chartOptions = {

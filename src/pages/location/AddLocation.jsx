@@ -149,6 +149,27 @@ const AddLocation = () => {
     }
   };
 
+  const fetchExpenseTypes = async () => {
+    setIsLoadingExpenseTypes(true);
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_APP_API_URL}/ExpenseTypes/Get-All-Expense-Types?activeOnly=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${auth?.token}`,
+          },
+        }
+      );
+      setExpenseTypes(response.data || []);
+    } catch (error) {
+      console.error("Error fetching expense types:", error);
+      toast.error("Failed to load expense types. Please try again.");
+      setExpenseTypes([]);
+    } finally {
+      setIsLoadingExpenseTypes(false);
+    }
+  };
+
   const fetchExpenseData = async () => {
     setIsLoadingExpenseData(true);
     try {
@@ -173,11 +194,14 @@ const AddLocation = () => {
   useEffect(() => {
     if (auth?.token) {
       fetchAddressesForDropdown();
+      fetchExpenseTypes();
       fetchExpenseData();
     } else {
       setIsLoading(false);
+      setIsLoadingExpenseTypes(false);
       setIsLoadingExpenseData(false);
       setAddresses([]);
+      setExpenseTypes([]);
       setExpenseData([]);
     }
   }, [auth?.token]);
@@ -288,7 +312,6 @@ const AddLocation = () => {
   };
 
   const handleAddAddress = async () => {
-
     if (!newAddressName || !newAddressComplete) {
       toast.error("Please enter Address Name and Complete Address.");
       return;

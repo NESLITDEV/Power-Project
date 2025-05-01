@@ -157,7 +157,7 @@ const UtilityManagement = () => {
         }
       );
 
-      if (response.status === 201) {
+      if (response.data.isSuccess) {
         toast.success(
           <FormattedMessage id="UTILITY.MANAGEMENT.SUCCESS.EXPENSE_TYPE_ADDED" />
         );
@@ -166,8 +166,10 @@ const UtilityManagement = () => {
         // Refresh expense types
         fetchExpenseTypes();
       } else {
-        toast.error(
-          <FormattedMessage id="UTILITY.MANAGEMENT.ERROR.ADD_EXPENSE_TYPE_FAILED" />
+        setIsAddExpenseTypeOpen(false);
+        setNewExpenseType("");
+        toast.error(response.data.message
+          // <FormattedMessage id="UTILITY.MANAGEMENT.ERROR.ADD_EXPENSE_TYPE_FAILED" />
         );
       }
     } catch (error) {
@@ -293,9 +295,7 @@ const UtilityManagement = () => {
                 <Input
                   value={newExpenseType}
                   onChange={(e) => setNewExpenseType(e.target.value)}
-                  placeholder={
-                    <FormattedMessage id="UTILITY.MANAGEMENT.ENTER_EXPENSE_NAME" />
-                  }
+                  placeholder="Expense Type Name"
                   className="w-full utility-input"
                 />
               </div>

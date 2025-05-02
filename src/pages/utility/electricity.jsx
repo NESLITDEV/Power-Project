@@ -277,7 +277,7 @@ const ElectricityUsage = ({
         {selectedFile?.url && (
           <Card className="p-6 electricity-card">
             <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-6 electricity-text-high">
-              <FormattedMessage id="UTILITY.ELECTRICITY.PREVIEW" />
+              Image Preview
             </h2>
             <div className="flex justify-center items-center border rounded-md p-2 dark:border-gray-700">
               <img

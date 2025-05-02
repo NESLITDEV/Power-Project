@@ -26,7 +26,7 @@ const Demo1LightSidebarPage = () => {
         <Toolbar>
           <ToolbarHeading title="Dashboard" description="" />
           <ToolbarActions>
-            <Popover>
+            {/* <Popover>
               <PopoverTrigger asChild>
                 <button
                   id="date"
@@ -60,7 +60,7 @@ const Demo1LightSidebarPage = () => {
                   numberOfMonths={2}
                 />
               </PopoverContent>
-            </Popover>
+            </Popover> */}
           </ToolbarActions>
         </Toolbar>
       </Container>

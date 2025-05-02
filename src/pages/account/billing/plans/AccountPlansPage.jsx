@@ -20,9 +20,9 @@ const AccountPlansPage = () => {
           <Toolbar>
             <ToolbarHeading title="Plans" description="   " />
             <ToolbarActions>
-              <Link to="#" className="btn btn-sm btn-light">
+              {/* <Link to="#" className="btn btn-sm btn-light">
                 View Billing
-              </Link>
+              </Link> */}
             </ToolbarActions>
           </Toolbar>
         </Container>

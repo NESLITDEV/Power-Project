@@ -208,7 +208,9 @@ const UtilityUpload = ({
                           icon="spinner"
                           className="animate-spin mr-2 h-4 w-4"
                         />
-                        <span>Processing...</span>
+                        <span className="dark:text-white font-medium">
+                          Processing...
+                        </span>
                       </div>
                     ) : (
                       <div className="flex items-center">

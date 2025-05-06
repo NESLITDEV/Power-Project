@@ -113,13 +113,13 @@ const Login = () => {
           </a>
         </div> */}
 
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           <span className="border-t border-gray-200 w-full"></span>
           <span className="text-2xs text-gray-500 font-medium uppercase">
             Or
           </span>
           <span className="border-t border-gray-200 w-full"></span>
-        </div>
+        </div> */}
 
         {formik.status && <Alert variant="danger">{formik.status}</Alert>}
 
